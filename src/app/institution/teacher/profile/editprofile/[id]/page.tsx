@@ -1,4 +1,5 @@
 "use client";
+// Importing necessary components and libraries
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
@@ -6,12 +7,20 @@ import { Moon, Sun } from "lucide-react";
 import { Input } from "@/components/ui/institution/input";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { Checkbox } from "@/components/ui/institution/checkbox";
 import { useTheme } from "@/components/ThemeProvider";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ModalCreate from "@/components/modals/modalCreate";
 
+// Interface defining the structure of a Discipline object
+interface Disciplina {
+  id: number;
+  nomeDisciplina: string;
+}
+
+// Main component for editing teacher profile
 export default function Profile({
   value,
   className,
@@ -19,10 +28,12 @@ export default function Profile({
   value: number;
   className?: string;
 }) {
+  // Getting URL parameters and initializing hooks
   const params = useParams();
   const id = params.id as string;
   const { darkMode, toggleTheme } = useTheme();
   
+  // State variables for form fields and component state
   const [nomeDocente, setNomeDocente] = useState("");
   const [emailDocente, setEmailDocente] = useState("");
   const [dataNascimentoDocente, setDataNascimentoDocente] = useState("");
@@ -30,9 +41,12 @@ export default function Profile({
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [disciplineId, setDisciplineId] = useState<number[]>([]);
+  const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
+  // Function to get today's date in YYYY-MM-DD format
   const getTodayDateString = (): string => {
     const today = new Date();
     const year = today.getFullYear();
@@ -41,11 +55,29 @@ export default function Profile({
     return `${year}-${month}-${day}`;
   };
 
+  // Function to format API date to YYYY-MM-DD format
   const formatApiDate = (apiDate: string) => {
     if (!apiDate) return "";
     return apiDate.split(' ')[0];
   };
 
+  // Effect to fetch available disciplines on component mount
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline")
+      .then((response) => response.json())
+      .then((data: Disciplina[]) => {
+        setDisciplinas(data);
+        setError(null);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar disciplinas:", error);
+        setError("Erro ao carregar disciplinas. Tente novamente mais tarde.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Effect to fetch teacher data when ID changes
   useEffect(() => {
     if (!id) return;
 
@@ -58,14 +90,25 @@ export default function Profile({
         setEmailDocente(data.emailDocente || "");
         setDataNascimentoDocente(formatApiDate(data.dataNascimentoDocente) || "");
         setTelefoneDocente(data.telefoneDocente || "");
+        if (data.disciplinas && Array.isArray(data.disciplinas)) {
+          setDisciplineId(data.disciplinas.map((d: Disciplina) => d.id));
+        }
       })
       .catch((error) => {
         console.error("Erro ao buscar dados do docente:", error);
-        setError("Erro ao carregar dados do docente.");
+        setError("Erro ao carregar dados do docente. Tente novamente mais tarde.");
       })
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Function to handle discipline selection/deselection
+  const handleDisciplineSelection = (id: number) => {
+    setDisciplineId((prev) =>
+      prev.includes(id) ? prev.filter((did) => did !== id) : [...prev, id]
+    );
+  };
+
+  // Function to validate birth date
   const validateDate = (dateString: string): boolean => {
     if (!dateString) return false;
     
@@ -85,14 +128,17 @@ export default function Profile({
     return true;
   };
 
+  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!nomeDocente || !emailDocente || !dataNascimentoDocente || !telefoneDocente) {
+    // Basic form validation
+    if (!nomeDocente || !emailDocente || !dataNascimentoDocente || !telefoneDocente || disciplineId.length === 0) {
       toast.warn("Preencha todos os campos obrigatórios.");
       return;
     }
 
+    // Date validation
     if (!validateDate(dataNascimentoDocente)) {
       return;
     }
@@ -100,6 +146,7 @@ export default function Profile({
     setIsModalOpen(true);
 
     try {
+      // API call to update teacher data
       const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`, {
         method: "PUT",
         headers: {
@@ -110,6 +157,7 @@ export default function Profile({
           emailDocente,
           dataNascimentoDocente,
           telefoneDocente,
+          disciplineId,
         }),
       });
 
@@ -127,6 +175,7 @@ export default function Profile({
     }
   };
 
+  // Function to get current date in formatted string
   const getCurrentDate = () => {
     const today = new Date();
     return today.toLocaleDateString("pt-BR", {
@@ -137,28 +186,38 @@ export default function Profile({
     });
   };
 
+  // Effect to apply dark mode theme
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
+  // Render the component
   return (
     <>
+      {/* Toast notification container */}
       <ToastContainer />
       
+      {/* Main page container */}
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
+        {/* Sidebar component */}
         <Sidebar />
         
+        {/* Main content area */}
         <main className="flex-1 p-8">
+          {/* Header section with title, date and theme toggle */}
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl font-bold text-blue-500">Editar docente</h1>
-            <p className="text-gray-500">{getCurrentDate()}</p>
+            <p className="text-gray-500">{getCurrentDate()}</
+            p>
             <Button onClick={toggleTheme}>
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
           </div>
 
+          {/* Form container */}
           <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-3xl">
+            {/* Profile image */}
             <Image
               src={
                 imageUrl ||
@@ -170,6 +229,7 @@ export default function Profile({
               className="rounded-full"
             />
 
+            {/* Form fields grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 {
@@ -219,6 +279,44 @@ export default function Profile({
               ))}
             </div>
 
+            {/* Disciplines selection section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-sm text-muted-foreground mb-4 dark:text-white">
+                  Seleção de disciplinas
+                </h3>
+                {loading ? (
+                  <p className="dark:text-white">Carregando disciplinas...</p>
+                ) : error ? (
+                  <p className="text-red-500">{error}</p>
+                ) : (
+                  <div className="space-y-3">
+                    {disciplinas.map((disciplina) => (
+                      <div
+                        key={disciplina.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={`disciplina-${disciplina.id}`}
+                          checked={disciplineId.includes(disciplina.id)}
+                          onCheckedChange={() =>
+                            handleDisciplineSelection(disciplina.id)
+                          }
+                        />
+                        <label
+                          htmlFor={`disciplina-${disciplina.id}`}
+                          className="dark:text-white"
+                        >
+                          {disciplina.nomeDisciplina}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Submit button */}
             <div className="flex justify-center">
               <Button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-8"
@@ -231,6 +329,7 @@ export default function Profile({
         </main>
       </div>
       
+      {/* Loading modal */}
       <ModalCreate isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} message="Editando docente..." />
     </>
   );
