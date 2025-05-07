@@ -188,7 +188,7 @@ export default function User() {
             {docenteData && (
               <>
                 <ProfileInfo
-                  imageUrl={docenteData.imageUrl || "/default-profile.png"} // Fallback for missing image
+                  imageUrl={docenteData.imageUrl} 
                   name={docenteData.nomeDocente}
                   email={docenteData.emailDocente}
                   birthDate={docenteData.dataNascimentoDocente}

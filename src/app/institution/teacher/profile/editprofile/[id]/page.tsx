@@ -1,5 +1,4 @@
 "use client";
-// Importing necessary components and libraries
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
@@ -7,108 +6,60 @@ import { Moon, Sun } from "lucide-react";
 import { Input } from "@/components/ui/institution/input";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { Checkbox } from "@/components/ui/institution/checkbox";
 import { useTheme } from "@/components/ThemeProvider";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ModalCreate from "@/components/modals/modalCreate";
 
-// Interface defining the structure of a Discipline object
-interface Disciplina {
+interface TeacherData {
   id: number;
-  nomeDisciplina: string;
+  name: string;
+  email: string;
+  birthDate: string;
+  phone: string;
+  imageUrl: string;
 }
 
-// Main component for editing teacher profile
-export default function Profile({
-  value,
-  className,
-}: {
-  value: number;
-  className?: string;
-}) {
-  // Getting URL parameters and initializing hooks
+export default function TeacherProfileEdit() {
   const params = useParams();
   const id = params.id as string;
   const { darkMode, toggleTheme } = useTheme();
-  
-  // State variables for form fields and component state
-  const [nomeDocente, setNomeDocente] = useState("");
-  const [emailDocente, setEmailDocente] = useState("");
-  const [dataNascimentoDocente, setDataNascimentoDocente] = useState("");
-  const [telefoneDocente, setTelefoneDocente] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [disciplineId, setDisciplineId] = useState<number[]>([]);
-  const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  // Function to get today's date in YYYY-MM-DD format
-  const getTodayDateString = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const [teacherData, setTeacherData] = useState<TeacherData>({
+    id: 0,
+    name: "",
+    email: "",
+    birthDate: "",
+    phone: "",
+    imageUrl: ""
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const formatApiDate = (dateString: string): string => {
+    if (!dateString) return "";
+    return dateString.split('T')[0];
   };
 
-  // Function to format API date to YYYY-MM-DD format
-  const formatApiDate = (apiDate: string) => {
-    if (!apiDate) return "";
-    return apiDate.split(' ')[0];
+  const formatPhone = (value: string): string => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 10) {
+      return numbers
+        .replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    } else {
+      return numbers
+        .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    }
   };
 
-  // Effect to fetch available disciplines on component mount
-  useEffect(() => {
-    setLoading(true);
-    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline")
-      .then((response) => response.json())
-      .then((data: Disciplina[]) => {
-        setDisciplinas(data);
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar disciplinas:", error);
-        setError("Erro ao carregar disciplinas. Tente novamente mais tarde.");
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  // Effect to fetch teacher data when ID changes
-  useEffect(() => {
-    if (!id) return;
-
-    setLoading(true);
-    fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setImageUrl(data.imageUrl);
-        setNomeDocente(data.nomeDocente || "");
-        setEmailDocente(data.emailDocente || "");
-        setDataNascimentoDocente(formatApiDate(data.dataNascimentoDocente) || "");
-        setTelefoneDocente(data.telefoneDocente || "");
-        if (data.disciplinas && Array.isArray(data.disciplinas)) {
-          setDisciplineId(data.disciplinas.map((d: Disciplina) => d.id));
-        }
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar dados do docente:", error);
-        setError("Erro ao carregar dados do docente. Tente novamente mais tarde.");
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  // Function to handle discipline selection/deselection
-  const handleDisciplineSelection = (id: number) => {
-    setDisciplineId((prev) =>
-      prev.includes(id) ? prev.filter((did) => did !== id) : [...prev, id]
-    );
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedPhone = formatPhone(e.target.value);
+    setTeacherData({...teacherData, phone: formattedPhone});
   };
 
-  // Function to validate birth date
   const validateDate = (dateString: string): boolean => {
     if (!dateString) return false;
     
@@ -118,65 +69,97 @@ export default function Profile({
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < minDate) {
-      toast.warn("A data de nascimento não pode ser anterior a 1900");
+      toast.warn("Data de nascimento não pode ser anterior a 1900");
       return false;
     }
     if (selectedDate > today) {
-      toast.warn("A data de nascimento não pode ser posterior ao dia atual");
+      toast.warn("Data de nascimento não pode ser no futuro");
       return false;
     }
     return true;
   };
 
-  // Function to handle form submission
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchTeacherData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`
+        );
+        if (!response.ok) throw new Error("Falha ao buscar dados do professor");
+        
+        const data = await response.json();
+        setTeacherData({
+          id: data.id,
+          name: data.nomeDocente || "",
+          email: data.emailDocente || "",
+          birthDate: formatApiDate(data.dataNascimentoDocente) || "",
+          phone: data.telefoneDocente || "",
+          imageUrl: data.imageUrl || ""
+        });
+      } catch (error) {
+        console.error("Erro ao buscar dados do professor:", error);
+        toast.error("Falha ao carregar dados do professor");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeacherData();
+  }, [id]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic form validation
-    if (!nomeDocente || !emailDocente || !dataNascimentoDocente || !telefoneDocente || disciplineId.length === 0) {
-      toast.warn("Preencha todos os campos obrigatórios.");
+    if (!teacherData.name || !teacherData.email || 
+        !teacherData.birthDate || !teacherData.phone) {
+      toast.warn("Preencha todos os campos!");
       return;
     }
 
-    // Date validation
-    if (!validateDate(dataNascimentoDocente)) {
+    if (!validateDate(teacherData.birthDate)) {
       return;
     }
 
     setIsModalOpen(true);
 
     try {
-      // API call to update teacher data
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nomeDocente,
-          emailDocente,
-          dataNascimentoDocente,
-          telefoneDocente,
-          disciplineId,
-        }),
-      });
+      const response = await fetch(
+        `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nomeDocente: teacherData.name,
+            emailDocente: teacherData.email,
+            dataNascimentoDocente: teacherData.birthDate,
+            telefoneDocente: teacherData.phone.replace(/\D/g, "")
+          }),
+        }
+      );
 
-      if (!response.ok) throw new Error("Erro ao atualizar o perfil.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Falha ao atualizar professor");
+      }
 
-      toast.success("✅ Perfil atualizado com sucesso!");
+      toast.success("Professor atualizado com sucesso!");
       setTimeout(() => {
         router.push("/institution/teacher");
       }, 2000);
     } catch (error) {
-      console.error("❌ Erro ao atualizar docente:", error);
-      toast.error("Erro ao atualizar perfil.");
+      console.error("Erro ao atualizar professor:", error);
+      toast.error(error instanceof Error ? error.message : "Falha ao atualizar professor");
     } finally {
       setIsModalOpen(false);
     }
   };
 
-  // Function to get current date in formatted string
-  const getCurrentDate = () => {
+  const getCurrentDate = (): string => {
     const today = new Date();
     return today.toLocaleDateString("pt-BR", {
       weekday: "short",
@@ -186,27 +169,36 @@ export default function Profile({
     });
   };
 
-  // Effect to apply dark mode theme
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  // Render the component
   return (
     <>
-      {/* Toast notification container */}
       <ToastContainer />
-      
-      {/* Main page container */}
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
-        {/* Sidebar component */}
         <Sidebar />
         
-        {/* Main content area */}
         <main className="flex-1 p-8">
-          {/* Header section with title, date and theme toggle */}
           <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400">
+                Editar Professor
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Preencha os campos abaixo para editar docente.
+              </p>
+            </div>
+            <p className="text-gray-500 dark:text-gray-400">
+              {getCurrentDate()}
+            </p>
+            <Button 
+              onClick={toggleTheme}
+              variant="ghost"
+              size="icon"
+              aria-label="Alternar tema"
+            >
             <h1 className="text-2xl font-bold text-blue-500">Editar docente</h1>
             <p className="text-gray-500">{getCurrentDate()}</
             p>
@@ -215,122 +207,133 @@ export default function Profile({
             </Button>
           </div>
 
-          {/* Form container */}
-          <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-3xl">
-            {/* Profile image */}
-            <Image
-              src={
-                imageUrl ||
-                "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-855.jpg"
-              }
-              alt="Profile"
-              width={80}
-              height={80}
-              className="rounded-full"
-            />
-
-            {/* Form fields grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {
-                  label: "Nome Completo",
-                  state: nomeDocente,
-                  setState: setNomeDocente,
-                  maxLength: 100,
-                  type: "text"
-                },
-                {
-                  label: "Data de Nascimento",
-                  state: dataNascimentoDocente,
-                  setState: setDataNascimentoDocente,
-                  type: "date",
-                  min: "1900-01-01",
-                  max: getTodayDateString()
-                },
-                {
-                  label: "Email",
-                  state: emailDocente,
-                  setState: setEmailDocente,
-                  maxLength: 100,
-                  type: "email"
-                },
-                {
-                  label: "Telefone",
-                  state: telefoneDocente,
-                  setState: setTelefoneDocente,
-                  maxLength: 20,
-                  type: "tel"
-                }
-              ].map(({ label, state, setState, maxLength, type, min, max }) => (
-                <div key={label} className="space-y-2">
-                  <label className="text-sm text-muted-foreground dark:text-white">
-                    {label}
-                  </label>
-                  <Input
-                    type={type}
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-[#F0F7FF]"
-                    maxLength={maxLength}
-                    min={min}
-                    max={max}
+          <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow">
+            <div className="flex items-center gap-4">
+              {teacherData.imageUrl ? (
+                <div className="relative w-20 h-20">
+                  <Image
+                    src={teacherData.imageUrl}
+                    alt="Foto do professor"
+                    fill
+                    className="rounded-full object-cover"
                   />
                 </div>
-              ))}
-            </div>
-
-            {/* Disciplines selection section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                  <span className="text-gray-500 dark:text-gray-400">Sem foto</span>
+                </div>
+              )}
               <div>
-                <h3 className="text-sm text-muted-foreground mb-4 dark:text-white">
-                  Seleção de disciplinas
-                </h3>
-                {loading ? (
-                  <p className="dark:text-white">Carregando disciplinas...</p>
-                ) : error ? (
-                  <p className="text-red-500">{error}</p>
-                ) : (
-                  <div className="space-y-3">
-                    {disciplinas.map((disciplina) => (
-                      <div
-                        key={disciplina.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <Checkbox
-                          id={`disciplina-${disciplina.id}`}
-                          checked={disciplineId.includes(disciplina.id)}
-                          onCheckedChange={() =>
-                            handleDisciplineSelection(disciplina.id)
-                          }
-                        />
-                        <label
-                          htmlFor={`disciplina-${disciplina.id}`}
-                          className="dark:text-white"
-                        >
-                          {disciplina.nomeDisciplina}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Alterar foto
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) {
+                      const file = e.target.files[0];
+                      const reader = new FileReader();
+                      reader.onload = (event) => 
+                        setTeacherData({...teacherData, imageUrl: event.target?.result as string});
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-md file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                    dark:file:bg-gray-700 dark:file:text-blue-300
+                    dark:hover:file:bg-gray-600"
+                />
               </div>
             </div>
 
-            {/* Submit button */}
-            <div className="flex justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Nome Completo *
+                </label>
+                <Input
+                  type="text"
+                  value={teacherData.name}
+                  onChange={(e) => setTeacherData({...teacherData, name: e.target.value})}
+                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  maxLength={100}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Data de Nascimento *
+                </label>
+                <Input
+                  type="date"
+                  value={teacherData.birthDate}
+                  onChange={(e) => setTeacherData({...teacherData, birthDate: e.target.value})}
+                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  min="1900-01-01"
+                  max={new Date().toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Email *
+                </label>
+                <Input
+                  type="email"
+                  value={teacherData.email}
+                  onChange={(e) => setTeacherData({...teacherData, email: e.target.value})}
+                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  maxLength={100}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Telefone *
+                </label>
+                <Input
+                  type="tel"
+                  value={teacherData.phone}
+                  onChange={handlePhoneChange}
+                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  maxLength={15}
+                  placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-center pt-6">
               <Button
-                className="bg-blue-500 hover:bg-blue-600 text-white px-8"
+                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-md transition-colors"
                 onClick={handleSubmit}
+                disabled={loading}
               >
-                Editar docente
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin">↻</span>
+                    Salvando...
+                  </span>
+                ) : "Salvar Alterações"}
               </Button>
             </div>
           </div>
         </main>
       </div>
       
-      {/* Loading modal */}
-      <ModalCreate isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} message="Editando docente..." />
+      <ModalCreate 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        message="Atualizando dados do professor..." 
+      />
     </>
   );
 }
