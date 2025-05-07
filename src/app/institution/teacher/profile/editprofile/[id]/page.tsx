@@ -199,6 +199,10 @@ export default function TeacherProfileEdit() {
               size="icon"
               aria-label="Alternar tema"
             >
+            <h1 className="text-2xl font-bold text-blue-500">Editar docente</h1>
+            <p className="text-gray-500">{getCurrentDate()}</
+            p>
+            <Button onClick={toggleTheme}>
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
           </div>
