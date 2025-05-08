@@ -104,7 +104,11 @@ export function Calendar({ selectedDate, onSelectDate }: CalendarProps) {
         {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
           const event = events.find((e) => {
             const eventDate = new Date(e.dataEvento)
-            return eventDate.getDate() === day && eventDate.getMonth() === selectedMonth && eventDate.getFullYear() === selectedYear
+            // Adiciona 1 dia à data do evento
+            eventDate.setDate(eventDate.getDate() + 1)
+            return eventDate.getDate() === day && 
+                   eventDate.getMonth() === selectedMonth && 
+                   eventDate.getFullYear() === selectedYear
           })
           return (
             <button

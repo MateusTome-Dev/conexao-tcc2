@@ -10,14 +10,28 @@ export function EventList({ className }: EventListProps) {
   const [loading, setLoading] = useState(true);
   const [expandedEventId, setExpandedEventId] = useState<number | null>(null);
 
+  // Função para adicionar 1 dia a uma data
+  const addOneDay = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split('T')[0];
+  };
+
   useEffect(() => {
     async function fetchEvents() {
       try {
         const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/event");
         const data: Event[] = await response.json();
 
+        // Adiciona 1 dia a cada evento e filtra
         const today = new Date().toISOString().split("T")[0];
-        const upcomingEvents = data.filter((event) => event.dataEvento >= today);
+        const upcomingEvents = data
+          .map(event => ({
+            ...event,
+            // Cria uma cópia do evento com a data modificada
+            dataEvento: addOneDay(event.dataEvento)
+          }))
+          .filter((event) => event.dataEvento >= today);
 
         setEvents(upcomingEvents);
       } catch (error) {
@@ -109,7 +123,7 @@ export function EventList({ className }: EventListProps) {
 
               {expandedEventId === event.id && (
                 <div className="px-4 pb-4 sm:px-6 sm:pb-6 pt-0 border-t dark:border-gray-800">
-                  <div className="flex flex-row  sm:grid-cols-2 gap-4">
+                  <div className="flex flex-row sm:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <h4 className="font-medium mb-2">Descrição</h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
