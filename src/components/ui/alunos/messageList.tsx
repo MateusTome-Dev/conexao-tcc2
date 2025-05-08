@@ -64,7 +64,7 @@ function MessageList({ className }: { className?: string }) {
     const fetchMessages = async () => {
       try {
         const reminderResponse = await fetch(
-          `http://localhost:3000/api/reminder/${turma}`
+          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/reminder/${turma}`
         );
   
         if (!reminderResponse.ok)
@@ -129,7 +129,7 @@ function MessageList({ className }: { className?: string }) {
                         "Não encontrado."}
                     </h3>
                     <span className="text-gray-500 text-sm">
-                      {new Date(message.horarioSistema).toLocaleString(
+                      {new Date(new Date(message.horarioSistema).getTime() - 3 * 60 * 60 * 1000).toLocaleString(
                         "pt-BR",
                         {
                           day: "2-digit",

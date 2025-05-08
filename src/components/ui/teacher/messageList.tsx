@@ -115,7 +115,7 @@ function MessageList({ className }: { className?: string }) {
                         "Não encontrado."}
                     </h3>
                     <span className="text-gray-500 text-sm">
-                      {new Date(message.horarioSistema).toLocaleString(
+                      {new Date(new Date(message.horarioSistema).getTime() - 3 * 60 * 60 * 1000).toLocaleString(
                         "pt-BR",
                         {
                           day: "2-digit",
