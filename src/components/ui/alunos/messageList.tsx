@@ -64,7 +64,7 @@ function MessageList({ className }: { className?: string }) {
     const fetchMessages = async () => {
       try {
         const reminderResponse = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/reminder/${turma}`
+          `http://localhost:3000/api/reminder/${turma}`
         );
   
         if (!reminderResponse.ok)
