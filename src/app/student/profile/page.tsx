@@ -34,22 +34,6 @@ export default function User({
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState<string | null>(null); 
 
-  /**
-   * Formata uma data no padrão brasileiro (DD/MM/AAAA)
-   * @param dateString - Data em formato string
-   * @returns Data formatada ou "Data inválida" se não for parseável
-   */
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return "Data inválida";
-    }
-    const day = String(date.getDate()).padStart(2, "0"); 
-    const month = String(date.getMonth() + 1).padStart(2, "0"); 
-    const year = date.getFullYear(); 
-    return `${day}/${month}/${year}`;
-  };
-
   // Efeito para aplicar o tema selecionado
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode); 
@@ -107,7 +91,7 @@ export default function User({
             imageUrl={studentData.imageUrl || "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-855.jpg?t=st=1738800543~exp=1738804143~hmac=5400a6f0c02663ed6f91ff172c490ed49dbd456d03bed9e4c98b2aed06b0dfdb&w=826"} // Imagem padrão caso não tenha
             name={studentData.nome}
             email={studentData.emailAluno}
-            birthDate={formatDate(studentData.dataNascimentoAluno)}
+            birthDate={studentData.dataNascimentoAluno}
             phone={studentData.telefoneAluno}
             registrationNumber={studentData.matriculaAluno}
           />
