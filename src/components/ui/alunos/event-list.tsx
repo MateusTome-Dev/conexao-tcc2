@@ -75,7 +75,7 @@ export function EventList({ className }: EventListProps) {
           <p className="text-gray-500">Nenhum evento futuro encontrado.</p>
         </div>
       ) : (
-        <div className="space-y-2 sm:space-y-3">
+        <div className="space-y-2 sm:space-y-3 max-h-[480px] pr-2 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 dark:scrollbar-track-[#141414]">
           {events.map((event) => (
             <div
               key={event.id}
@@ -89,7 +89,7 @@ export function EventList({ className }: EventListProps) {
                 className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 cursor-pointer"
                 onClick={() => toggleEventExpansion(event.id)}
               >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500 flex-shrink-0 flex items-center justify-center text-white font-medium">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-500 flex-shrink-0 flex items-center justify-center text-white font-medium ">
                   {new Date(event.dataEvento).getDate()}
                 </div>
                 
@@ -126,7 +126,7 @@ export function EventList({ className }: EventListProps) {
                   <div className="flex flex-row sm:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <h4 className="font-medium mb-2">Descrição</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 break-words w-20">
                         {event.descricaoEvento || "Nenhuma descrição fornecida."}
                       </p>
                     </div>

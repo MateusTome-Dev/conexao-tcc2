@@ -194,7 +194,7 @@ export function EventSidebar() {
                 <h3 className="text-lg font-semibold mb-4 dark:text-[#D0CECE]">
                   Próximos Eventos
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-3 p-2 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 dark:scrollbar-track-[#141414]">
                   {events.length > 0 ? (
                     events.map((event, index) => (
                       <div

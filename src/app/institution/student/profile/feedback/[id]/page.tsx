@@ -87,7 +87,7 @@ export default function Feedback() {
         </div>
 
         {/* Área de conteúdo com tabela de ocorrências e desempenho */}
-        <div className="space-y-6 bg-[#FFFFFF] dark:bg-black dark:text-[#ffffffd8] p-8 rounded-2xl max-h-[800px] overflow-y-auto pr scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 mt-6">
+        <div className="space-y-6 bg-[#FFFFFF] dark:bg-black dark:text-[#ffffffd8] p-8 rounded-2xl h-[800px] overflow-y-auto pr scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 mt-6">
           {/* Tabela de ocorrências */}
           <OccurrencesTable />
           
