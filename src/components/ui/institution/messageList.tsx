@@ -29,8 +29,7 @@ function MessageList({ className }: { className?: string }) {
           `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/reminder`
         );
 
-        if (!reminderResponse.ok)
-          throw new Error("Nenhum aviso disponível.");
+        if (!reminderResponse.ok) throw new Error("Nenhum aviso disponível.");
 
         const reminders: Message[] = await reminderResponse.json();
 
@@ -103,16 +102,16 @@ function MessageList({ className }: { className?: string }) {
                         "Não encontrado."}
                     </h3>
                     <span className="text-gray-500 text-sm">
-                      {new Date(message.horarioSistema).toLocaleString(
-                        "pt-BR",
-                        {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
+                      {new Date(
+                        new Date(message.horarioSistema).getTime() -
+                          3 * 60 * 60 * 1000
+                      ).toLocaleString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   </div>
                   <p className="text-gray-600 dark:text-[#8A8A8A] text-sm mt-1 max-w-3xl break-words">
