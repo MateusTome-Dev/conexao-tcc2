@@ -190,9 +190,6 @@ export default function TeacherProfileEdit() {
                 Preencha os campos abaixo para editar docente.
               </p>
             </div>
-            <p className="text-gray-500 dark:text-gray-400">
-              {getCurrentDate()}
-            </p>
             <Button 
               onClick={toggleTheme}
               variant="ghost"
@@ -203,7 +200,7 @@ export default function TeacherProfileEdit() {
             </Button>
           </div>
 
-          <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-lg shadow">
             <div className="flex items-center gap-4">
               {teacherData.imageUrl ? (
                 <div className="relative w-20 h-20">
@@ -215,7 +212,7 @@ export default function TeacherProfileEdit() {
                   />
                 </div>
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-[#141414] flex items-center justify-center">
                   <span className="text-gray-500 dark:text-gray-400">Sem foto</span>
                 </div>
               )}
@@ -241,7 +238,7 @@ export default function TeacherProfileEdit() {
                     file:text-sm file:font-semibold
                     file:bg-blue-50 file:text-blue-700
                     hover:file:bg-blue-100
-                    dark:file:bg-gray-700 dark:file:text-blue-300
+                    dark:file:bg-[#141414] dark:file:text-blue-300
                     dark:hover:file:bg-gray-600"
                 />
               </div>
@@ -256,7 +253,7 @@ export default function TeacherProfileEdit() {
                   type="text"
                   value={teacherData.name}
                   onChange={(e) => setTeacherData({...teacherData, name: e.target.value})}
-                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={100}
                   required
                 />
@@ -270,7 +267,7 @@ export default function TeacherProfileEdit() {
                   type="date"
                   value={teacherData.birthDate}
                   onChange={(e) => setTeacherData({...teacherData, birthDate: e.target.value})}
-                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   min="1900-01-01"
                   max={new Date().toISOString().split('T')[0]}
                   required
@@ -285,7 +282,7 @@ export default function TeacherProfileEdit() {
                   type="email"
                   value={teacherData.email}
                   onChange={(e) => setTeacherData({...teacherData, email: e.target.value})}
-                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={100}
                   required
                 />
@@ -299,7 +296,7 @@ export default function TeacherProfileEdit() {
                   type="tel"
                   value={teacherData.phone}
                   onChange={handlePhoneChange}
-                  className="bg-blue-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={15}
                   placeholder="(00) 00000-0000"
                   required

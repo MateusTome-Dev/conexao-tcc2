@@ -39,7 +39,7 @@ export function ProfileInfo({
             alt="Foto de perfil"
           />
         ) : (
-          <span className="text-gray-500">Foto</span>
+          <span className="text-gray-500">Sem foto</span>
         )}
         <div className="text-center md:text-left">
           <h2 className="text-xl md:text-2xl font-semibold text-black dark:text-white">

@@ -26,7 +26,7 @@ export default function CardFeedback({ person, rote = "/", imageUrl }: CardFeedb
             className="object-cover w-full h-full"
           />
         ) : (
-          <span className="text-gray-500">Foto</span>
+          <span className="text-gray-500">Sem foto</span>
         )}
       </div>
       <span className="font-medium dark:text-white max-w-80 break-words">{person}</span>
