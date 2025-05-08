@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm install --platform=linux --arch=x64 sharp"
+    "lint": "next lint"
   },
   "dependencies": {
     "@fullcalendar/daygrid": "^6.1.15",
