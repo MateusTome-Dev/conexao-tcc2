@@ -134,6 +134,7 @@ export default function TeacherProfileEdit() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            imageUrl: teacherData.imageUrl,
             nomeDocente: teacherData.name,
             emailDocente: teacherData.email,
             dataNascimentoDocente: teacherData.birthDate,

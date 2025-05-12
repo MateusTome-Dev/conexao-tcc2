@@ -370,8 +370,8 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
       </main>
 
       <Dialog open={openModal} onOpenChange={setOpenModal}>
-        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white shadow-lg border-0">
-          <div className="bg-white p-4 border-b">
+        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden bg-white dark:bg-[#141414] dark:text-white shadow-lg border-0">
+          <div className="bg-white dark:bg-[#141414] dark:text-blue-500 p-4 border-b">
             <DialogTitle className="flex items-center text-xl font-semibold">
               <Calendar className="mr-2 h-5 w-5" />
               {isEditing ? "Editar Evento" : "Novo Evento"}
@@ -379,7 +379,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
           </div>
           <div className="p-6">
             <div className="grid gap-5 py-2">
-              <div className="grid gap-2">
+              <div className="grid gap-2 dark:text-white">
                 <Label htmlFor="tituloEvento" className="font-medium">
                   Título
                 </Label>
@@ -393,7 +393,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
+                <div className="grid gap-2 dark:text-white">
                   <Label htmlFor="dataEvento" className="font-medium">
                     Data
                   </Label>
@@ -406,7 +406,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
                     min={getBeforeYesterdayDate().toISOString().split('T')[0]}
                   />
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-2 dark:text-white">
                   <Label htmlFor="horarioEvento" className="font-medium">
                     Horário
                   </Label>
@@ -428,7 +428,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
                   />
                 </div>
               </div>
-              <div className="grid gap-2">
+              <div className="grid gap-2 dark:text-white">
                 <Label htmlFor="localEvento" className="font-medium">
                   Local
                 </Label>
@@ -441,7 +441,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
                   maxLength={35}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="grid gap-2 dark:text-white">
                 <Label htmlFor="descricaoEvento" className="font-medium">
                   Descrição
                 </Label>
@@ -457,18 +457,18 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
               </div>
             </div>
           </div>
-          <div className="border-t p-4 bg-white flex flex-wrap gap-3 justify-between sm:justify-between">
+          <div className="border-t p-4 bg-white dark:bg-[#141414] flex flex-wrap gap-3 justify-between sm:justify-between">
             {isEditing && (
               <Button
                 variant="destructive"
                 onClick={confirmDeleteEvent}
                 disabled={isLoading}
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 dark:text-white"
               >
                 <Trash2 className="h-4 w-4" /> Excluir
               </Button>
             )}
-            <div className="flex gap-2 ml-auto">
+            <div className="flex gap-2 ml-auto dark:text-white ">
               <Button variant="outline" onClick={() => setOpenModal(false)} disabled={isLoading}>
                 Cancelar
               </Button>
@@ -517,19 +517,19 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
       </Dialog>
 
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden bg-white shadow-lg border-0">
-          <div className="bg-white p-4 border-b">
-            <DialogTitle className="flex items-center text-xl font-semibold text-gray-900">
-              <Trash2 className="mr-2 h-5 w-5" />
+        <DialogContent className="sm:max-w-[425px] p-0 overflow-hidden bg-white shadow-lg border-0 dark:bg-[#141414]">
+          <div className="bg-white dark:bg-[#141414] p-4 border-b">
+            <DialogTitle className="flex items-center text-xl font-semibold text-gray-900 dark:text-blue-500">
+              <Trash2 className="mr-2 h-5 w-5 dark:text-blue-500" />
               Confirmar exclusão
             </DialogTitle>
           </div>
-          <div className="p-6">
+          <div className="p-6 dark:bg-[#141414]">
             <div className="py-2 space-y-4">
-              <p className="text-gray-700">Tem certeza que deseja excluir este evento?</p>
-              <div className="p-4 bg-gray-100 rounded-md border border-gray-200">
-                <p className="font-semibold text-gray-900">{selectedEvent?.tituloEvento}</p>
-                <div className="mt-2 text-sm text-gray-600 flex items-center">
+              <p className="text-gray-700 dark:text-white">Tem certeza que deseja excluir este evento?</p>
+              <div className="p-4 bg-gray-100 rounded-md border border-gray-200 dark:bg-[#141414] ">
+                <p className="font-semibold text-gray-900 dark:text-blue-500">{selectedEvent?.tituloEvento}</p>
+                <div className="mt-2 text-sm text-gray-600 flex items-center dark:bg-[#141414]">
                   <Calendar className="h-4 w-4 mr-2" />
                   {selectedEvent?.dataEvento} às {selectedEvent?.horarioEvento?.substring(0, 5)}
                 </div>
@@ -537,7 +537,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
               <p className="text-sm text-red-600">Esta ação não pode ser desfeita.</p>
             </div>
           </div>
-          <div className="border-t p-4 bg-white flex justify-end gap-3">
+          <div className="border-t p-4 bg-white dark:bg-[#141414] flex justify-end gap-3 dark:text-white">
             <Button variant="outline" onClick={() => setOpenDeleteDialog(false)} disabled={isLoading}>
               Cancelar
             </Button>
@@ -545,7 +545,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
               variant="destructive"
               onClick={handleDeleteEvent}
               disabled={isLoading}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 dark:text-white"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">

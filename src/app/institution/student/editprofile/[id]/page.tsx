@@ -99,6 +99,7 @@ export default function Profile({
             dataNascimentoAluno: formatDateForBackend(dataNascimentoAluno),
             telefoneAluno,
             turmaId,
+            imageUrl,
             matriculaAluno,
           }),
         }
