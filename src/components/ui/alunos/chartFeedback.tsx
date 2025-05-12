@@ -48,7 +48,7 @@ const EngagementChart: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [bimestre, setBimestre] = useState<number>(1);
   const [allData, setAllData] = useState<FeedbackData[]>([]);
-  const [selectedType, setSelectedType] = useState(0);
+  const [selectedType, setSelectedType] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [creators, setCreators] = useState<Creator[]>([]);
   const [selectedCreator, setSelectedCreator] = useState<number | null>(null);
@@ -118,6 +118,12 @@ const EngagementChart: React.FC = () => {
       const dados = await resposta.json();
       console.log("Dados dos criadores:", dados);
       setCreators(dados);
+      
+      // Seleciona o primeiro professor por padrão se existir
+      if (dados.length > 0) {
+        setSelectedCreator(dados[0].id);
+        setSelectedCreatorName(dados[0].nomeDocente);
+      }
     } catch (err: any) {
       console.error("Erro ao buscar criadores:", err);
       setError(err.message || "Erro ao buscar os criadores");
@@ -125,7 +131,7 @@ const EngagementChart: React.FC = () => {
     }
   };
 
-  const fetchData = async () => {
+  const fetchAllData = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
@@ -140,26 +146,33 @@ const EngagementChart: React.FC = () => {
       if (!resposta.ok) throw new Error("Falha ao buscar os dados");
 
       const dados = await resposta.json();
-      console.log("Dados recebidos:", dados);
+      console.log("Todos os dados recebidos:", dados);
+      setAllData(dados);
+    } catch (err: any) {
+      console.error("Erro ao buscar todos os dados:", err);
+      setError(err.message);
+      setAllData([]);
+    }
+  };
 
-      if (!dados || dados.length === 0) {
+  const updateChartData = () => {
+    try {
+      if (!allData || allData.length === 0) {
         setData([]);
         return;
       }
 
+      // Filtrar por professor selecionado
       const filteredByCreator = selectedCreator
-        ? dados.filter(
-            (item: FeedbackData) =>
-              item.createdByDTO && item.createdByDTO.id === selectedCreator
+        ? allData.filter(
+            (item) => item.createdByDTO && item.createdByDTO.id === selectedCreator
           )
-        : dados;
+        : allData;
 
-      const filteredData =
-        bimestre === 0
-          ? filteredByCreator
-          : filteredByCreator.filter(
-              (item: FeedbackData) => item.bimestre === bimestre
-            );
+      // Filtrar por bimestre selecionado
+      const filteredData = filteredByCreator.filter(
+        (item) => item.bimestre === bimestre
+      );
 
       if (filteredData.length === 0) {
         setData([]);
@@ -200,6 +213,7 @@ const EngagementChart: React.FC = () => {
       setData(formattedData);
       setError(null);
 
+      // Atualiza o nome do professor selecionado
       if (filteredData.length > 0 && filteredData[0].createdByDTO) {
         setSelectedCreatorName(filteredData[0].createdByDTO.nomeDocente);
       } else {
@@ -215,11 +229,14 @@ const EngagementChart: React.FC = () => {
 
   useEffect(() => {
     fetchCreators();
+    fetchAllData();
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [bimestre, selectedCreator, chartWidth]); // Adicionar chartWidth como dependência
+    if (allData.length > 0) {
+      updateChartData();
+    }
+  }, [bimestre, selectedCreator, chartWidth, allData]);
 
   // Componente de tooltip personalizado
   const CustomTooltip = ({ active, payload }: any) => {
@@ -246,23 +263,23 @@ const EngagementChart: React.FC = () => {
         <div className="w-full sm:w-auto">
           <Select
             onValueChange={(value) => {
-              const selectedId = Number(value);
-              const selectedCreator = creators.find(
-                (creator) => creator.id === selectedId
-              );
-              setSelectedCreator(selectedId);
-              setSelectedCreatorName(
-                selectedCreator ? selectedCreator.nomeDocente : null
-              );
+              // Encontra o professor pelo nome selecionado
+              const selectedCreator = creators.find(c => c.nomeDocente === value);
+              if (selectedCreator) {
+                setSelectedCreator(selectedCreator.id);
+                setSelectedCreatorName(selectedCreator.nomeDocente);
+              }
             }}
-            value={selectedCreator ? String(selectedCreator) : ""}
+            value={selectedCreatorName || ""}
           >
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Selecione o docente" />
+              <SelectValue placeholder="Selecione o docente">
+                {selectedCreatorName || "Selecione o docente"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {creators.map((creator) => (
-                <SelectItem key={creator.id} value={String(creator.nomeDocente)}>
+                <SelectItem key={creator.id} value={creator.nomeDocente}>
                   {creator.nomeDocente}
                 </SelectItem>
               ))}
@@ -279,7 +296,6 @@ const EngagementChart: React.FC = () => {
           />
         </div>
       </div>
-      {}
       {error ? (
         <div className="text-red-500 mb-4 flex items-center">
           <span className="material-icons mr-2">error</span>

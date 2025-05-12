@@ -35,8 +35,7 @@ const EngagementChart: React.FC = () => {
   const [selectedType, setSelectedType] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [creators, setCreators] = useState<Creator[]>([]);
-  const [selectedCreator, setSelectedCreator] = useState<number | null>(null);
-  const [selectedCreatorName, setSelectedCreatorName] = useState<string | null>(null);
+  const [selectedCreatorId, setSelectedCreatorId] = useState<number | null>(null);
   const [chartWidth, setChartWidth] = useState<number>(0);
 
   useEffect(() => {
@@ -49,7 +48,7 @@ const EngagementChart: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const valorVindoDoSelect = (value: string) => {
+  const handleBimestreChange = (value: string) => {
     switch (value) {
       case "1º Bimestre":
         setSelectedType(1);
@@ -89,22 +88,27 @@ const EngagementChart: React.FC = () => {
         },
       });
 
-      if (!resposta.ok) throw new Error("Falha ao buscar os criadores");
+      if (!resposta.ok) throw new Error("Falha ao buscar os professores");
 
       const dados = await resposta.json();
       setCreators(dados);
+      
+      // Seleciona o primeiro professor por padrão se existir
+      if (dados.length > 0) {
+        setSelectedCreatorId(dados[0].id);
+      }
     } catch (err: any) {
-      console.error("Erro ao buscar criadores:", err);
-      setError(err.message || "Erro ao buscar os criadores");
+      console.error("Erro ao buscar professores:", err);
+      setError(err.message || "Erro ao buscar os professores");
       setCreators([]);
     }
   };
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
-
       if (!studentId) throw new Error("ID do aluno não encontrado na URL");
 
       const resposta = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/feedback/${studentId}`, {
@@ -122,13 +126,13 @@ const EngagementChart: React.FC = () => {
         return;
       }
 
-      const filteredByCreator = selectedCreator
-        ? dados.filter((item: FeedbackData) => item.createdByDTO && item.createdByDTO.id === selectedCreator)
+      // Filtra por professor selecionado
+      const filteredByCreator = selectedCreatorId
+        ? dados.filter((item: FeedbackData) => item.createdByDTO?.id === selectedCreatorId)
         : dados;
 
-      const filteredData = bimestre === 0
-        ? filteredByCreator
-        : filteredByCreator.filter((item: FeedbackData) => item.bimestre === bimestre);
+      // Filtra por bimestre selecionado
+      const filteredData = filteredByCreator.filter((item: FeedbackData) => item.bimestre === bimestre);
 
       if (filteredData.length === 0) {
         setData([]);
@@ -161,12 +165,6 @@ const EngagementChart: React.FC = () => {
 
       setData(formattedData);
       setError(null);
-
-      if (filteredData.length > 0 && filteredData[0].createdByDTO) {
-        setSelectedCreatorName(filteredData[0].createdByDTO.nomeDocente);
-      } else {
-        setSelectedCreatorName(null);
-      }
     } catch (err: any) {
       setError(err.message);
       setData([]);
@@ -180,8 +178,16 @@ const EngagementChart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [bimestre, selectedCreator, studentId, chartWidth]);
+    if (creators.length > 0 && studentId) {
+      fetchData();
+    }
+  }, [bimestre, selectedCreatorId, studentId, chartWidth]);
+
+  const getSelectedCreatorName = () => {
+    if (!selectedCreatorId) return "Selecione o Professor";
+    const creator = creators.find(c => c.id === selectedCreatorId);
+    return creator ? creator.nomeDocente : "Selecione o Professor";
+  };
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload || payload.length === 0) return null;
@@ -202,20 +208,15 @@ const EngagementChart: React.FC = () => {
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full sm:w-auto">
           <Select
-            onValueChange={(value) => {
-              const selectedId = Number(value);
-              const selectedCreator = creators.find((creator) => creator.id === selectedId);
-              setSelectedCreator(selectedId);
-              setSelectedCreatorName(selectedCreator ? selectedCreator.nomeDocente : null);
-            }}
-            value={selectedCreator ? String(selectedCreator) : ""}
+            onValueChange={(value) => setSelectedCreatorId(Number(value))}
+            value={selectedCreatorId ? String(selectedCreatorId) : ""}
           >
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder="Selecione o Criador" />
+              <SelectValue placeholder={getSelectedCreatorName()} />
             </SelectTrigger>
             <SelectContent>
               {creators.map((creator) => (
-                <SelectItem key={creator.id} value={String(creator.nomeDocente)}>
+                <SelectItem key={creator.id} value={String(creator.id)}>
                   {creator.nomeDocente}
                 </SelectItem>
               ))}
@@ -226,14 +227,12 @@ const EngagementChart: React.FC = () => {
           <SmallSelect
             aria-label="Selecione o Bimestre"
             selectedType={selectedType}
-            setSelectedType={valorVindoDoSelect}
+            setSelectedType={handleBimestreChange}
             placeholder="Selecione o Bimestre"
             items={types}
           />
         </div>
       </div>
-
-      {}
 
       {error ? (
         <div className="text-red-500 mb-4 flex items-center">
@@ -276,7 +275,7 @@ const EngagementChart: React.FC = () => {
         </div>
       ) : (
         <div className="text-center text-gray-500 mt-4">
-          Nenhum feedback disponível para o bimestre selecionado.
+          Nenhum feedback disponível para o filtro selecionado.
         </div>
       )}
     </div>
