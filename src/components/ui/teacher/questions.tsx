@@ -345,7 +345,7 @@ export default function FeedbackForm() {
           </button>
         </div>
       </div>
-
+    {currentQuestion === questions.length - 1 && (
       <div className="flex justify-center mt-4">
         <button
           onClick={handleSubmit}
@@ -355,6 +355,7 @@ export default function FeedbackForm() {
           {isSubmitting ? "Enviando..." : "Enviar respostas"}
         </button>
       </div>
+    )}
     </div>
   );
 }
