@@ -32,7 +32,36 @@ export default function Profile({
   const [imageUrl, setImageUrl] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Função para fazer chamadas à API com tratamento de CORS
+  // Função para formatar a data do backend para o input date (versão aprimorada)
+  const formatDateForInput = (backendDate: string) => {
+    if (!backendDate) return "";
+    
+    // Se já estiver no formato correto (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(backendDate)) {
+      return backendDate;
+    }
+
+    // Remove qualquer parte de tempo e timezone se existir
+    const datePart = backendDate.split('T')[0].split(' ')[0];
+    
+    // Cria a data ajustando para o fuso horário local
+    const date = new Date(datePart);
+    if (isNaN(date.getTime())) return "";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  };
+
+  // Função para formatar a data para o backend
+  const formatDateForBackend = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().replace("T", " ").substring(0, 19);
+  };
+
   const fetchApi = async (url: string, options: RequestInit = {}) => {
     try {
       const response = await fetch(url, {
@@ -114,11 +143,6 @@ export default function Profile({
     }
   };
 
-  const formatDateForBackend = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toISOString().replace("T", " ").substring(0, 19);
-  };
-
   const getTodayDateString = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -141,10 +165,14 @@ export default function Profile({
           `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${id}`
         );
 
+        console.log("Dados recebidos do backend:", data);
+        console.log("Data de nascimento recebida:", data.dataNascimentoAluno);
+        console.log("Data formatada:", formatDateForInput(data.dataNascimentoAluno));
+
         setImageUrl(data.imageUrl || "");
         setName(data.nome || "");
         setEmail(data.emailAluno || "");
-        setBirthDate(data.dataNascimentoAluno || "");
+        setBirthDate(formatDateForInput(data.dataNascimentoAluno) || "");
         setPhone(data.telefoneAluno || "");
         setTurma(data.turmaId || "");
         setidentifierCode(data.matriculaAluno || "");
@@ -155,6 +183,11 @@ export default function Profile({
 
     loadStudentData();
   }, [id]);
+
+  // Efeito para depuração - monitora mudanças na data
+  useEffect(() => {
+    console.log("Estado atual da data de nascimento:", dataNascimentoAluno);
+  }, [dataNascimentoAluno]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -241,7 +274,7 @@ export default function Profile({
               },
               {
                 label: "Data de Nascimento",
-                state: dataNascimentoAluno,
+                state: dataNascimentoAluno || "", // Garante valor vazio se undefined
                 setState: setBirthDate,
                 type: "date",
               },

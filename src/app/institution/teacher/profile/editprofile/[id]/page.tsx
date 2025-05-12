@@ -39,9 +39,34 @@ export default function TeacherProfileEdit() {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const formatApiDate = (dateString: string): string => {
+  // Função aprimorada para formatar a data do backend para o input date
+  const formatDateForInput = (backendDate: string): string => {
+    if (!backendDate) return "";
+    
+    // Se já estiver no formato correto (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(backendDate)) {
+      return backendDate;
+    }
+
+    // Remove qualquer parte de tempo e timezone se existir
+    const datePart = backendDate.split('T')[0].split(' ')[0];
+    
+    // Cria a data ajustando para o fuso horário local
+    const date = new Date(datePart);
+    if (isNaN(date.getTime())) return "";
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  };
+
+  // Função para formatar a data para o backend
+  const formatDateForBackend = (dateString: string): string => {
     if (!dateString) return "";
-    return dateString.split('T')[0];
+    const date = new Date(dateString);
+    return date.toISOString().replace("T", " ").substring(0, 19);
   };
 
   const formatPhone = (value: string): string => {
@@ -91,13 +116,24 @@ export default function TeacherProfileEdit() {
         if (!response.ok) throw new Error("Falha ao buscar dados do professor");
         
         const data = await response.json();
+        
+        console.log("Dados brutos do backend:", data);
+        console.log("Data de nascimento recebida:", data.dataNascimentoDocente);
+        console.log("Data formatada:", formatDateForInput(data.dataNascimentoDocente));
+
         setTeacherData({
           id: data.id,
           name: data.nomeDocente || "",
           email: data.emailDocente || "",
-          birthDate: formatApiDate(data.dataNascimentoDocente) || "",
+          birthDate: formatDateForInput(data.dataNascimentoDocente) || "",
           phone: data.telefoneDocente || "",
           imageUrl: data.imageUrl || ""
+        });
+
+        // Log do estado após atualização
+        console.log("Estado do professor após carregamento:", {
+          ...teacherData,
+          birthDate: formatDateForInput(data.dataNascimentoDocente) || ""
         });
       } catch (error) {
         console.error("Erro ao buscar dados do professor:", error);
@@ -109,6 +145,11 @@ export default function TeacherProfileEdit() {
 
     fetchTeacherData();
   }, [id]);
+
+  // Efeito para monitorar mudanças na data de nascimento
+  useEffect(() => {
+    console.log("Data de nascimento atualizada:", teacherData.birthDate);
+  }, [teacherData.birthDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +178,7 @@ export default function TeacherProfileEdit() {
             imageUrl: teacherData.imageUrl,
             nomeDocente: teacherData.name,
             emailDocente: teacherData.email,
-            dataNascimentoDocente: teacherData.birthDate,
+            dataNascimentoDocente: formatDateForBackend(teacherData.birthDate),
             telefoneDocente: teacherData.phone.replace(/\D/g, "")
           }),
         }
@@ -266,7 +307,7 @@ export default function TeacherProfileEdit() {
                 </label>
                 <Input
                   type="date"
-                  value={teacherData.birthDate}
+                  value={teacherData.birthDate || ""}
                   onChange={(e) => setTeacherData({...teacherData, birthDate: e.target.value})}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   min="1900-01-01"
