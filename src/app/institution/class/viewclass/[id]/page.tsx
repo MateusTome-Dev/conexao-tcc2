@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/alunos/button";
 import Sidebar from "@/components/layout/sidebarInstitution";
 import SearchInput from "@/components/ui/search";
 import { useParams } from "next/navigation";
-import FloatingButton from "@/components/ui/institution/FloatingButton";
+import FloatingButtonClass from "@/components/ui/institution/floatingButtonClass";
 import { useTheme } from "@/components/ThemeProvider";
 import Link from "next/link";
 
@@ -188,7 +188,7 @@ export default function StudentsPage({
       </div>
 
       {/* Botão flutuante para adicionar novo estudante */}
-      <FloatingButton rote={`../../student/createStudent/${id}`} />
+      <FloatingButtonClass id={id}/>
     </div>
   );
 }
