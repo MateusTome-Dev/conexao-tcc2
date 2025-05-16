@@ -150,210 +150,217 @@ export default function CSVImporter() {
       .filter((item) => item.nomeAluno && item.dataNascimentoAluno);
   };
   const sendToAPI = async () => {
-  if (data.length === 0) {
-    toast.warn("Nenhum dado para enviar");
-    return;
-  }
-
-  setIsLoading(true);
-  setMessage("Validando e enviando dados para a API...");
-
-  try {
-    // Transformação e validação inicial (mantida do código anterior)
-    const transformedData = transformDataForAPI(data);
-    
-    // Funções de validação
-    const validateEmail = (email) => {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
-    };
-
-    const validatePhone = (phone) => {
-      const cleanedPhone = phone.toString().replace(/\D/g, '');
-      return cleanedPhone.length === 10 || cleanedPhone.length === 11;
-    };
-
-    // Valida os dados transformados
-    const validData = [];
-    const errorMessages = [];
-
-    for (const [index, item] of transformedData.entries()) {
-      try {
-        // Validação de campos obrigatórios
-        if (!item.nomeAluno?.trim()) {
-          throw new Error(`Linha ${index + 2}: Nome é obrigatório`);
-        }
-
-        if (!item.emailAluno?.trim()) {
-          throw new Error(`Linha ${index + 2}: Email é obrigatório`);
-        }
-
-        if (!item.telefoneAluno?.toString().trim()) {
-          throw new Error(`Linha ${index + 2}: Telefone é obrigatório`);
-        }
-
-        if (!item.dataNascimentoAluno) {
-          throw new Error(`Linha ${index + 2}: Data de nascimento é obrigatória`);
-        }
-
-        // Validação de email
-        if (!validateEmail(item.emailAluno)) {
-          throw new Error(`Linha ${index + 2}: Email inválido`);
-        }
-
-        // Validação de telefone
-        if (!validatePhone(item.telefoneAluno)) {
-          throw new Error(`Linha ${index + 2}: Telefone inválido (deve ter 10 ou 11 dígitos)`);
-        }
-
-        // Validação da data de nascimento
-        const birthDate = new Date(item.dataNascimentoAluno);
-        const minDate = new Date("1900-01-01");
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (birthDate < minDate) {
-          throw new Error(`Linha ${index + 2}: Data de nascimento não pode ser anterior a 1900`);
-        }
-
-        if (birthDate > today) {
-          throw new Error(`Linha ${index + 2}: Data de nascimento não pode ser futura`);
-        }
-
-        // Padroniza os dados antes de enviar
-        validData.push({
-          nomeAluno: item.nomeAluno.trim(),
-          emailAluno: item.emailAluno.trim(),
-          telefoneAluno: item.telefoneAluno.toString().replace(/\D/g, ''),
-          dataNascimentoAluno: item.dataNascimentoAluno,
-          turmaId: id,
-        });
-
-      } catch (error) {
-        errorMessages.push(error.message);
-        toast.warn(error.message);
-      }
-    }
-
-    // Verifica se há dados válidos
-    if (validData.length === 0) {
-      toast.warn("Nenhum registro válido para enviar");
-      setIsLoading(false);
+    if (data.length === 0) {
+      toast.warn("Nenhum dado para enviar");
       return;
     }
 
-    // Mostra resumo de erros se houver
-    if (errorMessages.length > 0) {
-      toast.warn(
-        `${errorMessages.length} registro(s) com erro(s) - verifique acima`
-      );
-    }
+    setIsLoading(true);
+    setMessage("Validando e enviando dados para a API...");
 
-    // Envio para API
-    const token = localStorage.getItem("token");
+    try {
+      // Transformação e validação inicial (mantida do código anterior)
+      const transformedData = transformDataForAPI(data);
 
-    const response = await fetch(
-      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/students/list",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(validData),
-      }
-    );
+      // Funções de validação
+      const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+      };
 
-    if (response.ok) {
-      const result = await response.json();
-      toast.success(
-        `${validData.length} aluno(s) importado(s) com sucesso!`
-      );
-      setMessage(`${validData.length} aluno(s) importado(s) com sucesso`);
-    } else {
-      const errorResponse = await response.text();
-      
-      // Tratamento específico para erros 400 (e-mails duplicados)
-      if (response.status === 400) {
+      const validatePhone = (phone) => {
+        const cleanedPhone = phone.toString().replace(/\D/g, "");
+        return cleanedPhone.length === 10 || cleanedPhone.length === 11;
+      };
+
+      // Valida os dados transformados
+      const validData = [];
+      const errorMessages = [];
+
+      for (const [index, item] of transformedData.entries()) {
         try {
-          const errorData = JSON.parse(errorResponse);
-          
-          // Extrai os erros individuais de e-mail duplicado
-          if (errorData.details && typeof errorData.details === 'string') {
-            const errorMessages = errorData.details.split(';');
-            
-            errorMessages.forEach(msg => {
-              const cleanMsg = msg.trim();
-              if (cleanMsg) {
-                toast.warn(`${cleanMsg}`);
-              }
-            });
+          // Validação de campos obrigatórios
+          if (!item.nomeAluno?.trim()) {
+            throw new Error(`Linha ${index + 2}: Nome é obrigatório`);
           }
-          
-          // Mensagem geral de erro
-          toast.error(`${errorData.error || 'Erro ao processar alunos'}`, {
-            autoClose: 4000
+
+          if (!item.emailAluno?.trim()) {
+            throw new Error(`Linha ${index + 2}: Email é obrigatório`);
+          }
+
+          if (!item.telefoneAluno?.toString().trim()) {
+            throw new Error(`Linha ${index + 2}: Telefone é obrigatório`);
+          }
+
+          if (!item.dataNascimentoAluno) {
+            throw new Error(
+              `Linha ${index + 2}: Data de nascimento é obrigatória`
+            );
+          }
+
+          // Validação de email
+          if (!validateEmail(item.emailAluno)) {
+            throw new Error(`Linha ${index + 2}: Email inválido`);
+          }
+
+          // Validação de telefone
+          if (!validatePhone(item.telefoneAluno)) {
+            throw new Error(
+              `Linha ${
+                index + 2
+              }: Telefone inválido (deve ter 10 ou 11 dígitos)`
+            );
+          }
+
+          // Validação da data de nascimento
+          const birthDate = new Date(item.dataNascimentoAluno);
+          const minDate = new Date("1900-01-01");
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          if (birthDate < minDate) {
+            throw new Error(
+              `Linha ${
+                index + 2
+              }: Data de nascimento não pode ser anterior a 1900`
+            );
+          }
+
+          if (birthDate > today) {
+            throw new Error(
+              `Linha ${index + 2}: Data de nascimento não pode ser futura`
+            );
+          }
+
+          // Padroniza os dados antes de enviar
+          validData.push({
+            nomeAluno: item.nomeAluno.trim(),
+            emailAluno: item.emailAluno.trim(),
+            telefoneAluno: item.telefoneAluno.toString().replace(/\D/g, ""),
+            dataNascimentoAluno: item.dataNascimentoAluno,
+            turmaId: id,
           });
-          
-          throw new Error(errorData.error || 'Erro ao processar alunos');
-        } catch (e) {
-          // Se não conseguir parsear, mostra o erro original
-          throw new Error(`Erro na API: ${errorResponse}`);
+        } catch (error) {
+          errorMessages.push(error.message);
+          toast.warn(error.message);
         }
-      } else {
-        throw new Error(`Erro na API: ${response.status} - ${errorResponse}`);
       }
+
+      // Verifica se há dados válidos
+      if (validData.length === 0) {
+        toast.warn("Nenhum registro válido para enviar");
+        setIsLoading(false);
+        return;
+      }
+
+      // Mostra resumo de erros se houver
+      if (errorMessages.length > 0) {
+        toast.warn(
+          `${errorMessages.length} registro(s) com erro(s) - verifique acima`
+        );
+      }
+
+      // Envio para API
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/students/list",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(validData),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        toast.success(`${validData.length} aluno(s) importado(s) com sucesso!`);
+        setMessage(`${validData.length} aluno(s) importado(s) com sucesso`);
+      } else {
+        const errorResponse = await response.text();
+
+        // Tratamento específico para erros 400 (e-mails duplicados)
+        if (response.status === 400) {
+          try {
+            const errorData = JSON.parse(errorResponse);
+
+            // Extrai os erros individuais de e-mail duplicado
+            if (errorData.details && typeof errorData.details === "string") {
+              const errorMessages = errorData.details.split(";");
+
+              errorMessages.forEach((msg) => {
+                const cleanMsg = msg.trim();
+                if (cleanMsg) {
+                  toast.warn(`${cleanMsg}`);
+                }
+              });
+            }
+
+            // Mensagem geral de erro
+            toast.error(`${errorData.error || "Erro ao processar alunos"}`, {
+              autoClose: 4000,
+            });
+
+            throw new Error(errorData.error || "Erro ao processar alunos");
+          } catch (e) {
+            // Se não conseguir parsear, mostra o erro original
+            throw new Error(`Erro na API: ${errorResponse}`);
+          }
+        } else {
+          throw new Error(`Erro na API: ${response.status} - ${errorResponse}`);
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao enviar para API:", error);
+
+      // Só mostra o toast genérico se não for um erro 400 (que já foi tratado)
+      if (!error.message.includes("Erro ao criar estudantes")) {
+        toast.warn(`⛔ ${error.message}`);
+      }
+
+      setMessage("Erro no envio dos dados");
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error("Erro ao enviar para API:", error);
-    
-    // Só mostra o toast genérico se não for um erro 400 (que já foi tratado)
-    if (!error.message.includes('Erro ao criar estudantes')) {
-      toast.warn(`⛔ ${error.message}`);
-    }
-    
-    setMessage("Erro no envio dos dados");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
-  <>
-    <ToastContainer />
-    <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
-      <Sidebar />
-      
-      <div className="flex-1 p-8">
-        {/* Cabeçalho */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-blue-500">
-              Criar novos alunos
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Selecione um arquivo CSV ou XLSX para criar alunos em lote.
-            </p>
-          </div>
-          <Button 
-            onClick={toggleTheme} 
-            size="icon" 
-            variant="ghost"
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </Button>
-        </div>
+    <>
+      <ToastContainer />
+      <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
+        <Sidebar />
 
-        {/* Seção de Upload */}
-        <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
-          <label className="block mb-4">
-            <span className="block text-sm font-medium mb-2 dark:text-white">Selecione o arquivo</span>
-            <input
-              type="file"
-              accept=".csv,.xlsx,.xls"
-              onChange={handleFileUpload}
-              disabled={isLoading}
-              className="block w-full text-sm text-gray-500
+        <div className="flex-1 p-8">
+          {/* Cabeçalho */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-blue-500">
+                Criar novos alunos
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Selecione um arquivo CSV ou XLSX para criar alunos em lote.
+              </p>
+            </div>
+            <Button onClick={toggleTheme} size="icon" variant="ghost">
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </Button>
+          </div>
+
+          {/* Seção de Upload */}
+          <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <label className="block mb-4">
+              <span className="block text-sm font-medium mb-2 dark:text-white">
+                Selecione o arquivo
+              </span>
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={handleFileUpload}
+                disabled={isLoading}
+                className="block w-full text-sm text-gray-500
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
                 file:text-sm file:font-semibold
@@ -361,94 +368,103 @@ export default function CSVImporter() {
                 hover:file:bg-blue-100
                 dark:file:bg-blue-900 dark:file:text-blue-100
                 dark:hover:file:bg-blue-800"
-            />
-          </label>
+              />
+            </label>
 
-          {isLoading && (
-            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-              <Loader2 className="animate-spin" size={16} />
-              <span>Carregando...</span>
-            </div>
-          )}
+            {isLoading && (
+              <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                <Loader2 className="animate-spin" size={16} />
+                <span>Carregando...</span>
+              </div>
+            )}
 
-          {message && (
-            <p className={`mt-4 text-sm ${
-              message.includes("sucesso") 
-                ? "text-green-600 dark:text-green-400" 
-                : "text-red-600 dark:text-red-400"
-            }`}>
-              {message}
-            </p>
-          )}
-        </div>
-
-        {/* Tabela de Pré-visualização */}
-        {data.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h3 className="font-semibold dark:text-white">
-                Dados Importados ({data.length} registros)
-              </h3>
-              <button
-                onClick={sendToAPI}
-                disabled={isLoading}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            {message && (
+              <p
+                className={`mt-4 text-sm ${
+                  message.includes("sucesso")
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
               >
-                {isLoading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="animate-spin" size={16} />
-                    Criando...
-                  </span>
-                ) : "Criar alunos"}
-              </button>
-            </div>
+                {message}
+              </p>
+            )}
+          </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    {headers.map((header, index) => (
-                      <th 
-                        key={index} 
-                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {data.slice(0, 5).map((row, rowIndex) => (
-                    <tr 
-                      key={rowIndex} 
-                      className={rowIndex % 2 === 0 ? "bg-white dark:bg-gray-800" : "bg-gray-50 dark:bg-gray-700"}
-                    >
-                      {headers.map((header, colIndex) => (
-                        <td 
-                          key={colIndex} 
-                          className="px-4 py-3 text-sm text-gray-800 dark:text-gray-200"
+          {/* Tabela de Pré-visualização */}
+          {data.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h3 className="font-semibold dark:text-white">
+                  Dados Importados ({data.length} registros)
+                </h3>
+                <button
+                  onClick={sendToAPI}
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="animate-spin" size={16} />
+                      Criando...
+                    </span>
+                  ) : (
+                    "Criar alunos"
+                  )}
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      {headers.map((header, index) => (
+                        <th
+                          key={index}
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                         >
-                          {row[header]}
-                        </td>
+                          {header}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                  {data.length > 5 && (
-                    <tr className="bg-gray-50 dark:bg-gray-700">
-                      <td 
-                        colSpan={headers.length}
-                        className="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400"
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {data.slice(0, 5).map((row, rowIndex) => (
+                      <tr
+                        key={rowIndex}
+                        className={
+                          rowIndex % 2 === 0
+                            ? "bg-white dark:bg-gray-800"
+                            : "bg-gray-50 dark:bg-gray-700"
+                        }
                       >
-                        + {data.length - 5} registros não exibidos
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                        {headers.map((header, colIndex) => (
+                          <td
+                            key={colIndex}
+                            className="px-4 py-3 text-sm text-gray-800 dark:text-gray-200"
+                          >
+                            {row[header]}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                    {data.length > 5 && (
+                      <tr className="bg-gray-50 dark:bg-gray-700">
+                        <td
+                          colSpan={headers.length}
+                          className="px-4 py-3 text-center text-sm text-gray-500 dark:text-gray-400"
+                        >
+                          + {data.length - 5} registros não exibidos
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
+}
