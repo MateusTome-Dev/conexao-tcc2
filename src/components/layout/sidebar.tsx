@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { Epilogue } from "next/font/google";
 import Image from "next/image";
@@ -162,6 +163,16 @@ const Sidebar = () => {
                 >
                   <Brain className="w-8 h-8 short:w-6 short:h-6 stroke-2 group-hover:text-blue-500" />
                   <span className="group-hover:text-blue-500">Emocional</span>
+                </Link>
+              </li>
+              <li className="group pt-4 pb-4 short:pt-2 short:pb-2 flex flex-row justify-center hover:bg-[#F0F7FF] hover:text-blue-500 dark:hover:bg-[#141414] hover:border-l-4 border-blue-500">
+                <Link
+                  href="/student/chatbox"
+                  className="flex items-center space-x-2 text-gray-500 w-32 text-center text-base font-semibold"
+                  onClick={() => isCollapsed && setIsOpen(false)}
+                >
+                  <MessageSquare className="w-8 h-8 short:w-6 short:h-6 stroke-2 group-hover:text-blue-500" />
+                  <span className="group-hover:text-blue-500">Chat</span>
                 </Link>
               </li>
             </ul>
