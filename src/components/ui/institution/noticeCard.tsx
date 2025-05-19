@@ -104,7 +104,7 @@ export function NoticeCard({ onRefresh }: NoticeCardProps) {
         {/* Card turma */}
         <Card>
           <h2 className="text-blue-600 font-semibold mb-4">Turmas</h2>
-          <div className="max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200">
+          <div className="max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 dark:scrollbar-track-[#141414]">
             {/* Exibindo Turmas */}
             <div className="space-y-2">
               {classes.length ? (
