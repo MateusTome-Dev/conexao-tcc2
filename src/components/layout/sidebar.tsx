@@ -20,6 +20,7 @@ import logo from "../../assets/images/logo.png";
 import Modal from "@/components/modals/modalSidebar";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const epilogue = Epilogue({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -28,6 +29,9 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
+  const [studentName, setStudentName] = useState<string>("Aluno");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Check if we're on mobile and auto-close sidebar
   useEffect(() => {
@@ -58,6 +62,47 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        // 1. Obtém o token JWT do localStorage
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Token não encontrado");
+
+        // 2. Decodifica o token para obter o ID do usuário
+        const decoded: any = jwtDecode(token);
+        const userId = decoded?.sub;
+        if (!userId) throw new Error("ID do usuário não encontrado no token");
+
+        // 3. Faz requisição para a API
+        const response = await fetch(
+          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // 4. Verifica se a resposta foi bem sucedida
+        if (!response.ok) throw new Error("Erro ao buscar dados do aluno");
+
+        // 5. Atualiza o nome do aluno (pegando apenas o primeiro nome)
+        const data = await response.json();
+        const firstName = data.nome ? data.nome.split(" ")[0] : "Aluno";
+        setStudentName(firstName);
+      } catch (err: any) {
+        // 6. Tratamento de erros
+        setError(err.message || "Erro ao buscar nome do aluno");
+      } finally {
+        // 7. Finaliza o carregamento
+        setLoading(false);
+      }
+    };
+
+    fetchStudentData();
+  }, []);
 
   return (
     <>
@@ -103,6 +148,11 @@ const Sidebar = () => {
             />
             <span className="text-[#6A95F4] text-xl font-bold">ONA</span>
           </Link>
+          <div className="flex items-center pb-2 justify-center">
+            <span className="text-[#6A95F4] text-base font-bold">
+              Olá, {studentName}
+            </span>
+          </div>
           <nav className="w-64 mt-24 short:mt-4">
             <ul>
               <li className="group pt-4 pb-4 short:pt-3 short:pb-3 flex flex-row justify-center hover:bg-[#F0F7FF] hover:text-blue-500 dark:hover:bg-[#141414] hover:border-l-4 border-blue-500 ">
@@ -195,8 +245,10 @@ const Sidebar = () => {
         confirmButtonColor="bg-red-600" // Cor personalizada
         confirmButtonText="Sair"
       >
-        <h2 className="text-lg font-bold mb-4 dark:text-white">Confirmar saída</h2>
-        <p  className="dark:text-white">Tem certeza que deseja sair?</p>
+        <h2 className="text-lg font-bold mb-4 dark:text-white">
+          Confirmar saída
+        </h2>
+        <p className="dark:text-white">Tem certeza que deseja sair?</p>
       </Modal>
     </>
   );

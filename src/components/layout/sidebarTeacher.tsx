@@ -1,13 +1,23 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Home, User, FileText, Calendar, LogOut, Users, Menu, X } from "lucide-react";
+import {
+  Home,
+  User,
+  FileText,
+  Calendar,
+  LogOut,
+  Users,
+  Menu,
+  X,
+} from "lucide-react";
 import { Epilogue } from "next/font/google";
 import Image from "next/image";
 import logo from "../../assets/images/logo.png";
 import Modal from "@/components/modals/modalSidebar"; // Importando o modal
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const epilogue = Epilogue({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -16,6 +26,9 @@ const SidebarTeacher = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
+  const [docenteName, setDocenteName] = useState<string>("Docente"); // Nome do docente
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [error, setError] = useState<string | null>(null);
 
   // Check if we're on mobile and auto-close sidebar
   useEffect(() => {
@@ -46,6 +59,47 @@ const SidebarTeacher = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  // Efeito para buscar os dados do professor ao montar o componente
+ useEffect(() => {
+  const fetchTeacherData = async () => {
+    try {
+      // Obtém o token do localStorage
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token não encontrado");
+
+      // Decodifica o token para obter o ID do usuário
+      const decoded: any = jwtDecode(token);
+      const userId = decoded?.sub;
+      if (!userId) throw new Error("ID do usuário não encontrado no token");
+
+      // Faz requisição para a API
+      const response = await fetch(
+        `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Erro ao buscar dados do docente");
+
+      // Processa os dados e atualiza o estado (pegando apenas o primeiro nome)
+      const data = await response.json();
+      const firstName = data.nomeDocente ? data.nomeDocente.split(' ')[0] : "Docente";
+      setDocenteName(firstName);
+    } catch (err: any) {
+      // Tratamento de erros
+      setError(err.message || "Erro ao buscar nome do docente");
+    } finally {
+      // Finaliza o estado de carregamento
+      setLoading(false);
+    }
+  };
+
+  fetchTeacherData();
+}, []);
 
   return (
     <>
@@ -87,6 +141,9 @@ const SidebarTeacher = () => {
               height={38}
             />
             <span className="text-[#6A95F4] text-xl font-bold">ONA</span>
+          </div>
+          <div className="flex items-center pb-2 justify-center">
+            <span className="text-[#6A95F4] text-base font-bold">Olá, {docenteName}</span>
           </div>
           <nav className="w-64 mt-24 short:mt-4">
             <ul>
@@ -160,7 +217,9 @@ const SidebarTeacher = () => {
         confirmButtonColor="bg-red-600" // Cor personalizada
         confirmButtonText="Sair"
       >
-        <h2 className="text-lg font-bold mb-4 dark:text-white">Confirmar saída</h2>
+        <h2 className="text-lg font-bold mb-4 dark:text-white">
+          Confirmar saída
+        </h2>
         <p className="dark:text-white">Tem certeza que deseja sair?</p>
       </Modal>
     </>
