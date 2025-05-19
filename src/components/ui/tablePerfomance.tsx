@@ -216,7 +216,7 @@ const EngagementChart: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               {creators.map((creator) => (
-                <SelectItem key={creator.id} value={String(creator.id)}>
+                <SelectItem key={creator.id} value={String(creator.nomeDocente)}>
                   {creator.nomeDocente}
                 </SelectItem>
               ))}

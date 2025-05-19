@@ -52,24 +52,16 @@ const EngagementChart: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [creators, setCreators] = useState<Creator[]>([]);
   const [selectedCreator, setSelectedCreator] = useState<number | null>(null);
-  const [selectedCreatorName, setSelectedCreatorName] = useState<string | null>(
-    null
-  );
+  const [selectedCreatorName, setSelectedCreatorName] = useState<string | null>(null);
   const [chartWidth, setChartWidth] = useState<number>(0);
 
-  // Função para monitorar o tamanho da janela
   useEffect(() => {
     const handleResize = () => {
       setChartWidth(window.innerWidth);
     };
 
-    // Definir largura inicial
     handleResize();
-
-    // Adicionar listener para redimensionamento
     window.addEventListener("resize", handleResize);
-
-    // Limpar listener ao desmontar
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -98,7 +90,7 @@ const EngagementChart: React.FC = () => {
 
   const normalizeData = (values: number[]) => {
     const maxValue = Math.max(...values);
-    if (maxValue === 0) return values;
+    if (maxValue === 0) return values.map(() => 0); // Retorna array de zeros se todos forem zero
     return values.map((value) => (value / maxValue) * 5);
   };
 
@@ -116,10 +108,8 @@ const EngagementChart: React.FC = () => {
       if (!resposta.ok) throw new Error("Falha ao buscar os criadores");
 
       const dados = await resposta.json();
-      console.log("Dados dos criadores:", dados);
       setCreators(dados);
       
-      // Seleciona o primeiro professor por padrão se existir
       if (dados.length > 0) {
         setSelectedCreator(dados[0].id);
         setSelectedCreatorName(dados[0].nomeDocente);
@@ -133,6 +123,7 @@ const EngagementChart: React.FC = () => {
 
   const fetchAllData = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
 
@@ -146,12 +137,14 @@ const EngagementChart: React.FC = () => {
       if (!resposta.ok) throw new Error("Falha ao buscar os dados");
 
       const dados = await resposta.json();
-      console.log("Todos os dados recebidos:", dados);
       setAllData(dados);
+      setError(null);
     } catch (err: any) {
       console.error("Erro ao buscar todos os dados:", err);
       setError(err.message);
       setAllData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,7 +182,6 @@ const EngagementChart: React.FC = () => {
 
       const normalizedValues = normalizeData(values);
 
-      // Definir nomes completos e abreviados para cada categoria
       const categories = [
         { tiny: "Eng", short: "Eng", full: "Engajamento" },
         { tiny: "Dis", short: "Disp", full: "Disposição" },
@@ -198,7 +190,6 @@ const EngagementChart: React.FC = () => {
         { tiny: "Cmp", short: "Comp", full: "Comportamento" },
       ];
 
-      // Formata os dados para o gráfico com nomes completos e abreviados
       const formattedData = categories.map((category, index) => ({
         name:
           chartWidth < 350
@@ -206,14 +197,13 @@ const EngagementChart: React.FC = () => {
             : chartWidth < 600
             ? category.short
             : category.full,
-        fullName: category.full, // Nome completo para o tooltip
+        fullName: category.full,
         value: normalizedValues[index],
       }));
 
       setData(formattedData);
       setError(null);
 
-      // Atualiza o nome do professor selecionado
       if (filteredData.length > 0 && filteredData[0].createdByDTO) {
         setSelectedCreatorName(filteredData[0].createdByDTO.nomeDocente);
       } else {
@@ -222,23 +212,27 @@ const EngagementChart: React.FC = () => {
     } catch (err: any) {
       setError(err.message);
       setData([]);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCreators();
-    fetchAllData();
+    const init = async () => {
+      try {
+        await fetchCreators();
+        await fetchAllData();
+      } catch (error) {
+        console.error("Initialization error:", error);
+      }
+    };
+    init();
   }, []);
 
   useEffect(() => {
-    if (allData.length > 0) {
+    if (allData.length > 0 || (allData.length === 0 && !loading)) {
       updateChartData();
     }
-  }, [bimestre, selectedCreator, chartWidth, allData]);
+  }, [bimestre, selectedCreator, chartWidth, allData, loading]);
 
-  // Componente de tooltip personalizado
   const CustomTooltip = ({ active, payload }: any) => {
     if (!active || !payload || payload.length === 0) return null;
 
@@ -251,19 +245,14 @@ const EngagementChart: React.FC = () => {
     );
   };
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <div className="flex justify-center items-center h-64">Carregando dados...</div>;
 
   return (
-    <div
-      className={`${
-        chartWidth < 400 ? "p-2 sm:p-4" : "p-6"
-      } bg-white shadow-md rounded-lg dark:bg-[#141414]`}
-    >
+    <div className={`${chartWidth < 400 ? "p-2 sm:p-4" : "p-6"} bg-white shadow-md rounded-lg dark:bg-[#141414]`}>
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full sm:w-auto">
           <Select
             onValueChange={(value) => {
-              // Encontra o professor pelo nome selecionado
               const selectedCreator = creators.find(c => c.nomeDocente === value);
               if (selectedCreator) {
                 setSelectedCreator(selectedCreator.id);
@@ -301,11 +290,11 @@ const EngagementChart: React.FC = () => {
           <span className="material-icons mr-2">error</span>
           {error}
         </div>
-      ) : data.length === 0 ? (
+      ) : data.length === 0 && !loading ? (
         <div className="text-center text-gray-500 mt-4">
           Nenhum feedback disponível para o bimestre selecionado.
         </div>
-      ) : data.length > 0 ? (
+      ) : (
         <div className="h-[350px] w-full overflow-hidden">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -338,10 +327,6 @@ const EngagementChart: React.FC = () => {
               <Bar dataKey="value" fill="#3182CE" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="text-center text-gray-500 mt-4">
-          Nenhum feedback disponível para o bimestre selecionado.
         </div>
       )}
     </div>
