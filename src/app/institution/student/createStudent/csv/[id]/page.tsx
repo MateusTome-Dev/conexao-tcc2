@@ -350,7 +350,7 @@ export default function CSVImporter() {
           </div>
 
           {/* Seção de Upload */}
-          <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="mb-8 p-6 bg-white dark:bg-black rounded-lg shadow">
             <label className="block mb-4">
               <span className="block text-sm font-medium mb-2 dark:text-white">
                 Selecione o arquivo
@@ -366,7 +366,7 @@ export default function CSVImporter() {
                 file:text-sm file:font-semibold
                 file:bg-blue-50 file:text-blue-700
                 hover:file:bg-blue-100
-                dark:file:bg-blue-900 dark:file:text-blue-100
+                dark:file:bg-blue-500 dark:file:text-blue-100
                 dark:hover:file:bg-blue-800"
               />
             </label>
@@ -393,7 +393,7 @@ export default function CSVImporter() {
 
           {/* Tabela de Pré-visualização */}
           {data.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+            <div className="bg-white dark:bg-black rounded-lg shadow overflow-hidden">
               <div className="p-4 border-b flex justify-between items-center">
                 <h3 className="font-semibold dark:text-white">
                   Dados Importados ({data.length} registros)
@@ -416,7 +416,7 @@ export default function CSVImporter() {
 
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
+                  <thead className="bg-gray-50 dark:bg-black">
                     <tr>
                       {headers.map((header, index) => (
                         <th
@@ -428,14 +428,14 @@ export default function CSVImporter() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="divide-y divide-gray-200 dark:divide-[#141414]">
                     {data.slice(0, 5).map((row, rowIndex) => (
                       <tr
                         key={rowIndex}
                         className={
                           rowIndex % 2 === 0
-                            ? "bg-white dark:bg-gray-800"
-                            : "bg-gray-50 dark:bg-gray-700"
+                            ? "bg-white dark:bg-black"
+                            : "bg-gray-50 dark:bg-black"
                         }
                       >
                         {headers.map((header, colIndex) => (

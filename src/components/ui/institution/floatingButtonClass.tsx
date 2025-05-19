@@ -18,17 +18,17 @@ export default function FloatingButton({ id }: Button) {
       onMouseLeave={() => setIsOpen(false)}
     >
       {isOpen && (
-        <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden dark:bg-black">
           <Link
             href={`../../student/createStudent/${id}`}
-            className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-gray-100 transition"
+            className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-gray-100 transition dark:text-blue-500 dark:hover:bg-[#151515]"
           >
             <User size={18} />
             Criar Individualmente
           </Link>
           <Link
             href={`../../student/createStudent/csv/${id}`}
-            className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-gray-100 transition border-t border-gray-200"
+            className="flex items-center gap-2 px-4 py-3 text-gray-800 hover:bg-gray-100 transition border-t border-gray-200 dark:text-blue-500 dark:hover:bg-[#151515]"
           >
             <Table size={18} />
             Criar com Planilha
