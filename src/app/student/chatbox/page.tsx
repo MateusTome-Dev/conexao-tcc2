@@ -93,7 +93,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-row min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-row min-h-screen bg-gray-50 dark:bg-[#141414]">
       <Sidebar/>
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="w-full flex flex-row justify-end mb-4">
@@ -103,13 +103,12 @@ export default function ChatPage() {
         </div>
         
         <div className="flex flex-col h-[calc(100vh-13rem)] max-w-3xl mx-auto">
-          <div className="flex-1 overflow-y-auto rounded-t-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
+          <div className="flex-1 overflow-y-auto rounded-t-lg bg-white dark:bg-[#000000] p-4 shadow-sm border-[1px] border-b-0 border-gray-400 dark:border-[1px] dark:border-b-0 dark:border-[#0077FF]">
             {messages.length === 0 ? (
               <div className="flex h-full items-center justify-center text-center">
                 <div className="max-w-md space-y-2">
                   <h2 className="text-2xl font-bold text-gray-700 dark:text-gray-200">Bem-vindo ao Chat com IA</h2>
                   <p className="text-gray-500 dark:text-gray-400">Faça uma pergunta para começar a conversa.</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">Usando o modelo: Llama 3 70B</p>
                 </div>
               </div>
             ) : (
@@ -143,13 +142,13 @@ export default function ChatPage() {
             )}
           </div>
 
-          <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-b-lg bg-white dark:bg-gray-800 p-4 shadow-sm">
+          <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-b-lg bg-white dark:bg-[#000000] p-4 shadow-sm border-[1px]  dark:border-[#0077FF] border-gray-400">
             <input
               type="text"
               value={input}
               onChange={handleInputChange}
               placeholder="Digite sua pergunta..."
-              className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 focus:outline-none bg-white dark:bg-gray-700 dark:text-white"
+              className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-gray-500 dark:focus:border-blue-500 focus:outline-none bg-white dark:bg-[#141414] dark:text-white"
               disabled={isLoading}
             />
             <button
