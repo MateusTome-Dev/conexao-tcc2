@@ -63,11 +63,17 @@ export default function TeacherProfileEdit() {
   };
 
   // Função para formatar a data para o backend
-  const formatDateForBackend = (dateString: string): string => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toISOString().replace("T", " ").substring(0, 19);
-  };
+const formatDateForBackend = (dateString: string): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000-03:00`;
+};
 
   const formatPhone = (value: string): string => {
     const numbers = value.replace(/\D/g, "");
