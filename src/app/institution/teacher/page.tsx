@@ -108,7 +108,7 @@ export default function Page() {
           {/* Search input */}
           <div className="w-full flex flex-row justify-center items-center mb-8">
             <SearchInput
-              placeholder="Digite o nome do professor"
+              placeholder="Digite o nome do docente"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
