@@ -13,6 +13,7 @@ import {
 import { Epilogue } from "next/font/google";
 import Image from "next/image";
 import logo from "../../assets/images/logo.png";
+import qrcode from "../../assets/images/qr-code-mobile.png";
 import Modal from "@/components/modals/modalSidebar"; // Importando o modal
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -158,7 +159,7 @@ const SidebarInstitution = () => {
           </div>
           <div className="flex items-center pb-2 justify-center">
             <span className="text-[#6A95F4] text-base font-bold">
-              Olá, {nameInstitution}
+              Olá, {nameInstitution}!
             </span>
           </div>
           <nav className="w-64 mt-24 short:mt-4">
@@ -202,6 +203,45 @@ const SidebarInstitution = () => {
                   <FileText className="w-8 h-8 short:w-6 short:h-6 stroke-2 group-hover:text-blue-500" />
                   <span className="group-hover:text-blue-500">Eventos</span>
                 </Link>
+              </li>
+              <li className="relative group pt-4 pb-4 short:pt-3 short:pb-3 flex flex-row justify-center">
+                {/* Botão/Link visível */}
+                <button className="flex items-center space-x-2 text-gray-500 w-32 text-center text-base font-semibold group-hover:text-blue-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-8 h-8 short:w-6 short:h-6 stroke-2 group-hover:text-blue-500"
+                  >
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M12 18v-6" />
+                    <path d="m9 15 3 3 3-3" />
+                  </svg>
+                  <a href="https://www.mediafire.com/file/247ah6dnljfg0pq/app-release_2.apk/file">
+                    <span>Baixar app</span>
+                  </a>
+                </button>
+
+                {/* QR Code que aparece abaixo no hover */}
+                <div className="absolute hidden group-hover:block left-1/2 transform -translate-x-1/2 top-full mt-2 z-50 bg-white p-3 rounded-lg shadow-xl border border-gray-200">
+                  <Image
+                    src={qrcode}
+                    alt="Baixe o app ONA"
+                    width={140}
+                    height={140}
+                    className="rounded"
+                  />
+                  <p className="text-xs text-center mt-2 text-gray-600">
+                    Escaneie para baixar o app
+                  </p>
+                </div>
               </li>
             </ul>
           </nav>
