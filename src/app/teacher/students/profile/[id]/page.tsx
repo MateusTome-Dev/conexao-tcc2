@@ -6,8 +6,9 @@ import { ProfileInfo } from "@/components/ui/alunos/profile"; // Componente de p
 import { Button } from "@/components/ui/alunos/button"; // Componente de botão personalizado
 import { useEffect, useState } from "react"; // Hooks do React
 import { useParams } from "next/navigation"; // Hook para acessar parâmetros da rota
-import { Moon, Sun } from "lucide-react"; // Ícones de lua e sol (tema claro/escuro)
+import { Moon, Sun, ArrowLeft } from "lucide-react"; // Ícones de lua e sol (tema claro/escuro)
 import { useTheme } from "@/components/ThemeProvider"; // Gerenciador de tema
+import { useRouter } from 'next/navigation';
 
 // Interface que define a estrutura dos dados do aluno
 interface StudentProfile {
@@ -40,6 +41,7 @@ export default function User({
   const [studentData, setStudentData] = useState<StudentProfile | null>(null); // Dados do aluno
   const [loading, setLoading] = useState(true); // Estado de carregamento
   const [error, setError] = useState<string | null>(null); // Mensagens de erro
+  const router = useRouter();
 
   /**
    * Função assíncrona para buscar os dados do aluno na API
@@ -83,12 +85,28 @@ export default function User({
       <main className="flex-1">
         <div className="p-8">
           {/* Container do botão de tema (superior direito) */}
-          <div className="flex items-center justify-end mb-8 w-full">
+          <div className="grid grid-cols-3 items-center mb-6 w-full">
+          {/* Botão Voltar (esquerda) */}
+          <div className="col-start-1">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+            >
+              <ArrowLeft size={20} />
+              Voltar
+            </button>
+          </div>
+
+          {/* Espaço vazio do meio */}
+          <div className="col-start-2"></div>
+
+          {/* Botão Tema (direita) */}
+          <div className="col-start-3 flex justify-end">
             <Button onClick={toggleTheme}>
-              {/* Alterna entre ícones de sol/lua conforme o tema */}
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
           </div>
+        </div>
           
           {/* Container do perfil do aluno */}
           <div className="bg-white dark:bg-black rounded-lg shadow-sm p-3">

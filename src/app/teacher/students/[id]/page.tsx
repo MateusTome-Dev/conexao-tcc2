@@ -2,7 +2,7 @@
 
 // Importing necessary React hooks and components
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react"; // Icons for theme toggle
+import { Moon, Sun, ArrowLeft } from "lucide-react"; // Icons for theme toggle
 import { Button } from "@/components/ui/alunos/button"; // Custom button component
 import Sidebar from "@/components/layout/sidebarTeacher"; // Teacher sidebar component
 import GlobalTablePerformance from "@/components/ui/globalTablePerformance"; // Performance table component
@@ -10,6 +10,7 @@ import SearchInput from "@/components/ui/search"; // Search input component
 import { useParams } from "next/navigation"; // Next.js hook for route parameters
 import { useTheme } from "@/components/ThemeProvider"; // Theme management hook
 import Link from "next/link"; // Next.js link component for client-side navigation
+import { useRouter } from 'next/navigation';
 
 // Interface defining the structure of a Student object
 interface Student {
@@ -38,6 +39,7 @@ export default function StudentsPage({
   const [search, setSearch] = useState(""); // Search term state
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
   const studentsPerPage = 10; // Number of students per page
+  const router = useRouter();
 
   // Effect to fetch students when component mounts or class ID changes
   useEffect(() => {
@@ -89,11 +91,27 @@ export default function StudentsPage({
       
       {/* Main content area */}
       <div className="w-full flex flex-col items-center mt-4 md:mt-8 px-4">
-        {/* Theme toggle button */}
-        <div className="w-full flex justify-end mb-4 md:mb-8 md:mr-28">
-          <Button onClick={toggleTheme}>
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </Button>
+      <div className="grid grid-cols-3 items-center mb-6 w-full">
+          {/* Botão Voltar (esquerda) */}
+          <div className="col-start-1">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+            >
+              <ArrowLeft size={20} />
+              Voltar
+            </button>
+          </div>
+
+          {/* Espaço vazio do meio */}
+          <div className="col-start-2"></div>
+
+          {/* Botão Tema (direita) */}
+          <div className="col-start-3 flex justify-end">
+            <Button onClick={toggleTheme}>
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </Button>
+          </div>
         </div>
         
         {/* Students table container */}

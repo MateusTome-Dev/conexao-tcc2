@@ -5,11 +5,12 @@ import { ProfileCard } from "@/components/ui/alunos/profile-card"; // Componente
 import Occurrence from "@/components/ui/teacher/ocurrence"; // Componente de ocorrências
 import { Button } from "@/components/ui/alunos/button"; // Componente de botão
 import { useEffect, useState } from "react"; // Hooks do React
-import { Moon, Sun } from "lucide-react"; // Ícones para tema claro/escuro
+import { Moon, Sun, ArrowLeft } from "lucide-react"; // Ícones para tema claro/escuro
 import TablePerformance from "@/components/ui/tablePerfomance"; // Tabela de desempenho
 import { useParams } from "next/navigation"; // Hook para acessar parâmetros da URL
 import FeedbackForm from "@/components/ui/teacher/questions"; // Formulário de feedback
 import { useTheme } from "@/components/ThemeProvider"; // Contexto de tema
+import { useRouter } from 'next/navigation';
 
 // Interface para tipagem dos dados do aluno
 interface StudentProfile {
@@ -39,6 +40,7 @@ export default function User({
   const [studentData, setStudentData] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Função para buscar dados do estudante na API
   const fetchStudentData = async () => {
@@ -81,11 +83,28 @@ export default function User({
       <main className="flex-1">
         <div className="p-8">
           {/* Cabeçalho com botão de alternar tema */}
-          <div className="flex items-center justify-between mb-8 max-2xl:mt-5">
+          <div className="grid grid-cols-3 items-center mb-6 w-full">
+          {/* Botão Voltar (esquerda) */}
+          <div className="col-start-1">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+            >
+              <ArrowLeft size={20} />
+              Voltar
+            </button>
+          </div>
+
+          {/* Espaço vazio do meio */}
+          <div className="col-start-2"></div>
+
+          {/* Botão Tema (direita) */}
+          <div className="col-start-3 flex justify-end">
             <Button onClick={toggleTheme}>
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
           </div>
+        </div>
           
           {/* Container principal com scroll */}
           <div className="bg-white dark:bg-black rounded-lg shadow-sm p-8 space-y-6 max-h-[800px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 dark:scrollbar-track-black">
