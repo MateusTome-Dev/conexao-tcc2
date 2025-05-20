@@ -2,7 +2,7 @@
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/institution/input";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -42,7 +42,7 @@ export default function TeacherProfileEdit() {
   // Função aprimorada para formatar a data do backend para o input date
   const formatDateForInput = (backendDate: string): string => {
     if (!backendDate) return "";
-    
+
     // Se já estiver no formato correto (YYYY-MM-DD)
     if (/^\d{4}-\d{2}-\d{2}$/.test(backendDate)) {
       return backendDate;
@@ -50,7 +50,7 @@ export default function TeacherProfileEdit() {
 
     // Remove qualquer parte de tempo e timezone se existir
     const datePart = backendDate.split('T')[0].split(' ')[0];
-    
+
     // Cria a data ajustando para o fuso horário local
     const date = new Date(datePart);
     if (isNaN(date.getTime())) return "";
@@ -58,22 +58,22 @@ export default function TeacherProfileEdit() {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate() + 1).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
   };
 
   // Função para formatar a data para o backend
-const formatDateForBackend = (dateString: string): string => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000-03:00`;
-};
+  const formatDateForBackend = (dateString: string): string => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000-03:00`;
+  };
 
   const formatPhone = (value: string): string => {
     const numbers = value.replace(/\D/g, "");
@@ -88,12 +88,12 @@ const formatDateForBackend = (dateString: string): string => {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedPhone = formatPhone(e.target.value);
-    setTeacherData({...teacherData, phone: formattedPhone});
+    setTeacherData({ ...teacherData, phone: formattedPhone });
   };
 
   const validateDate = (dateString: string): boolean => {
     if (!dateString) return false;
-    
+
     const selectedDate = new Date(dateString);
     const minDate = new Date("1900-01-01");
     const today = new Date();
@@ -120,9 +120,9 @@ const formatDateForBackend = (dateString: string): string => {
           `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`
         );
         if (!response.ok) throw new Error("Falha ao buscar dados do professor");
-        
+
         const data = await response.json();
-        
+
         console.log("Dados brutos do backend:", data);
         console.log("Data de nascimento recebida:", data.dataNascimentoDocente);
         console.log("Data formatada:", formatDateForInput(data.dataNascimentoDocente));
@@ -159,9 +159,9 @@ const formatDateForBackend = (dateString: string): string => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!teacherData.name || !teacherData.email || 
-        !teacherData.birthDate || !teacherData.phone) {
+
+    if (!teacherData.name || !teacherData.email ||
+      !teacherData.birthDate || !teacherData.phone) {
       toast.warn("Preencha todos os campos!");
       return;
     }
@@ -227,22 +227,35 @@ const formatDateForBackend = (dateString: string): string => {
       <ToastContainer />
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
         <Sidebar />
-        
+
         <main className="flex-1 p-8">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400">
-                Editar Professor
+            {/* Botão Voltar - alinhado à esquerda */}
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors text-blue-500 dark:text-blue-400 flex-shrink-0"
+            >
+              <ArrowLeft size={20} />
+              <span className="hidden sm:inline">Voltar</span>
+            </button>
+
+            {/* Container central para o título - ocupa o espaço disponível */}
+            <div className="flex-1 text-center mx-4 min-w-0">
+              <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400 truncate">
+                Editar Teacher
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                 Preencha os campos abaixo para editar docente.
               </p>
             </div>
-            <Button 
+
+            {/* Botão Tema - alinhado à direita */}
+            <Button
               onClick={toggleTheme}
               variant="ghost"
               size="icon"
               aria-label="Alternar tema"
+              className="flex-shrink-0"
             >
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
@@ -275,8 +288,8 @@ const formatDateForBackend = (dateString: string): string => {
                     if (e.target.files?.[0]) {
                       const file = e.target.files[0];
                       const reader = new FileReader();
-                      reader.onload = (event) => 
-                        setTeacherData({...teacherData, imageUrl: event.target?.result as string});
+                      reader.onload = (event) =>
+                        setTeacherData({ ...teacherData, imageUrl: event.target?.result as string });
                       reader.readAsDataURL(file);
                     }
                   }}
@@ -300,7 +313,7 @@ const formatDateForBackend = (dateString: string): string => {
                 <Input
                   type="text"
                   value={teacherData.name}
-                  onChange={(e) => setTeacherData({...teacherData, name: e.target.value})}
+                  onChange={(e) => setTeacherData({ ...teacherData, name: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={100}
                   required
@@ -314,7 +327,7 @@ const formatDateForBackend = (dateString: string): string => {
                 <Input
                   type="date"
                   value={teacherData.birthDate || ""}
-                  onChange={(e) => setTeacherData({...teacherData, birthDate: e.target.value})}
+                  onChange={(e) => setTeacherData({ ...teacherData, birthDate: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   min="1900-01-01"
                   max={new Date().toISOString().split('T')[0]}
@@ -329,7 +342,7 @@ const formatDateForBackend = (dateString: string): string => {
                 <Input
                   type="email"
                   value={teacherData.email}
-                  onChange={(e) => setTeacherData({...teacherData, email: e.target.value})}
+                  onChange={(e) => setTeacherData({ ...teacherData, email: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={100}
                   required
@@ -369,11 +382,11 @@ const formatDateForBackend = (dateString: string): string => {
           </div>
         </main>
       </div>
-      
-      <ModalCreate 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        message="Atualizando dados do professor..." 
+
+      <ModalCreate
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message="Atualizando dados do professor..."
       />
     </>
   );

@@ -2,14 +2,16 @@
 
 // Importações de bibliotecas e componentes
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/alunos/button";
 import Sidebar from "@/components/layout/sidebarInstitution";
 import SearchInput from "@/components/ui/search";
 import { useParams } from "next/navigation";
 import FloatingButtonClass from "@/components/ui/institution/floatingButtonClass";
+import GlobalTablePerformance from "@/components/ui/globalTablePerformance";
 import { useTheme } from "@/components/ThemeProvider";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 // Interface para definir a estrutura de um estudante
 interface Student {
@@ -38,6 +40,7 @@ export default function StudentsPage({
   const [search, setSearch] = useState(""); // Termo de busca
   const [currentPage, setCurrentPage] = useState(1); // Página atual
   const studentsPerPage = 10; // Número de estudantes por página
+  const router = useRouter();
 
   // Efeito para buscar os estudantes quando o ID muda
   useEffect(() => {
@@ -86,16 +89,32 @@ export default function StudentsPage({
     >
       {/* Barra lateral */}
       <Sidebar />
-      
+
       {/* Conteúdo principal */}
       <div className="w-full flex flex-col items-center mt-4 md:mt-8 px-4">
         {/* Botão para alternar entre tema dark/light */}
-        <div className="w-full flex justify-end mb-4 md:mb-8 md:mr-28">
-          <Button onClick={toggleTheme}>
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </Button>
-        </div>
+        <div className="grid grid-cols-3 items-center mb-6 w-full">
+          {/* Botão Voltar (esquerda) */}
+          <div className="col-start-1">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+            >
+              <ArrowLeft size={20} />
+              Voltar
+            </button>
+          </div>
 
+          {/* Espaço vazio do meio */}
+          <div className="col-start-2"></div>
+
+          {/* Botão Tema (direita) */}
+          <div className="col-start-3 flex justify-end">
+            <Button onClick={toggleTheme}>
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </Button>
+          </div>
+        </div>
         {/* Container principal da lista de estudantes */}
         <div className="w-full md:w-[85%] mx-auto p-4 border dark:border-black rounded-lg bg-white rounded-3xl dark:bg-black mb-4">
           {/* Campo de busca */}
@@ -173,22 +192,22 @@ export default function StudentsPage({
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 md:px-4 md:py-2 mx-1 my-1 rounded-md transition text-sm md:text-base ${
-                    currentPage === i + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-blue-500 hover:bg-gray-300"
-                  }`}
+                  className={`px-3 py-1 md:px-4 md:py-2 mx-1 my-1 rounded-md transition text-sm md:text-base ${currentPage === i + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-blue-500 hover:bg-gray-300"
+                    }`}
                 >
                   {i + 1}
                 </button>
               ))}
             </div>
           )}
+          <GlobalTablePerformance/>
         </div>
       </div>
 
       {/* Botão flutuante para adicionar novo estudante */}
-      <FloatingButtonClass id={id}/>
+      <FloatingButtonClass id={id} />
     </div>
   );
 }

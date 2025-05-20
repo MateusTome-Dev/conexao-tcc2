@@ -57,6 +57,11 @@ const Sidebar = () => {
     Cookies.remove("token");
     setIsModalOpen(false);
     router.push("/");
+    // Limpa o localStorage relacionado ao welcome message
+    localStorage.removeItem('hideWelcomeMessage');
+
+    // Adiciona um marcador para indicar que o usuário acabou de logar
+    sessionStorage.setItem('justLoggedIn', 'true');
   };
 
   const toggleSidebar = () => {
@@ -129,11 +134,9 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed 2xl:static z-40 w-64 max-2xl:h-screen bg-white dark:bg-black flex flex-col justify-between rounded-r-[20px] transition-transform duration-300 ease-in-out ${
-          epilogue.className
-        }`}
+        className={`${isOpen ? "translate-x-0" : "-translate-x-full"
+          } fixed 2xl:static z-40 w-64 max-2xl:h-screen bg-white dark:bg-black flex flex-col justify-between rounded-r-[20px] transition-transform duration-300 ease-in-out ${epilogue.className
+          }`}
       >
         <div>
           <Link

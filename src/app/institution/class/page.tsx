@@ -158,7 +158,7 @@ export default function CheckInEmocional({
             {/* Barra de pesquisa */}
             <div className="relative w-full max-w-md mx-auto flex justify-center items-center mb-6">
               <SearchInput
-                placeholder="Digite o nome ou código da turma"
+                placeholder="Digite o nome da turma"
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full"
               />

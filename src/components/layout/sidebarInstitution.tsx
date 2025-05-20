@@ -6,9 +6,6 @@ import {
   Home,
   User,
   FileText,
-  Calendar,
-  AlertTriangle,
-  Brain,
   LogOut,
   Menu,
   X,
@@ -19,6 +16,7 @@ import logo from "../../assets/images/logo.png";
 import Modal from "@/components/modals/modalSidebar"; // Importando o modal
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const epilogue = Epilogue({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -27,6 +25,9 @@ const SidebarInstitution = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [nameInstitution, setNameInstitution] = useState<string>("Instituição");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Check if we're on mobile and auto-close sidebar
   useEffect(() => {
@@ -52,11 +53,67 @@ const SidebarInstitution = () => {
     Cookies.remove("token");
     setIsModalOpen(false);
     router.push("/");
+    // Limpa o localStorage relacionado ao welcome message
+    localStorage.removeItem("hideWelcomeMessage");
+
+    // Adiciona um marcador para indicar que o usuário acabou de logar
+    sessionStorage.setItem("justLoggedIn", "true");
   };
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    const fetchInstitutionData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Token não encontrado no localStorage");
+        }
+  
+        const decoded: any = jwtDecode(token);
+        const userId = decoded?.sub;
+        if (!userId) {
+          throw new Error("ID do usuário não encontrado no token");
+        }
+  
+        const apiUrl = `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/institution/${userId}`;
+        
+        console.log("Fazendo requisição para:", apiUrl); // Debug
+  
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(
+            errorData?.message || `Erro HTTP: ${response.status}`
+          );
+        }
+  
+        const data = await response.json();
+        console.log("Dados recebidos:", data); // Debug
+        
+        if (data.nameInstitution) {
+          setNameInstitution(data.nameInstitution);
+        } else {
+          throw new Error("Nome da instituição não encontrado na resposta");
+        }
+      } catch (err: any) {
+        console.error("Erro ao buscar dados da instituição:", err);
+        setError(err.message);
+        setNameInstitution("Instituição"); // Fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchInstitutionData();
+  }, []);
 
   return (
     <>
@@ -100,7 +157,9 @@ const SidebarInstitution = () => {
             <span className="text-[#6A95F4] text-xl font-bold">ONA</span>
           </div>
           <div className="flex items-center pb-2 justify-center">
-            <span className="text-[#6A95F4] text-base font-bold">INSTITUIÇÃO</span>
+            <span className="text-[#6A95F4] text-base font-bold">
+              Olá, {nameInstitution}
+            </span>
           </div>
           <nav className="w-64 mt-24 short:mt-4">
             <ul>
@@ -114,7 +173,7 @@ const SidebarInstitution = () => {
                   <span className="group-hover:text-blue-500">Home</span>
                 </Link>
               </li>
-               <li className="group pt-4 pb-4 short:pt-3 short:pb-3 flex flex-row justify-center hover:bg-[#F0F7FF] hover:text-blue-500 dark:hover:bg-[#141414] hover:border-l-4 border-blue-500">
+              <li className="group pt-4 pb-4 short:pt-3 short:pb-3 flex flex-row justify-center hover:bg-[#F0F7FF] hover:text-blue-500 dark:hover:bg-[#141414] hover:border-l-4 border-blue-500">
                 <Link
                   href="/institution/teacher"
                   className="flex items-center space-x-2 text-gray-500 w-32 text-center text-base font-semibold"
@@ -164,7 +223,9 @@ const SidebarInstitution = () => {
         confirmButtonColor="bg-red-600" // Cor personalizada
         confirmButtonText="Sair"
       >
-        <h2 className="text-lg font-bold mb-4 dark:text-white">Confirmar saída</h2>
+        <h2 className="text-lg font-bold mb-4 dark:text-white">
+          Confirmar saída
+        </h2>
         <p className="dark:text-white">Tem certeza que deseja sair?</p>
       </Modal>
     </>

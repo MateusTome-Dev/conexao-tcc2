@@ -54,6 +54,11 @@ const SidebarTeacher = () => {
     Cookies.remove("token");
     setIsModalOpen(false);
     router.push("/");
+    // Limpa o localStorage relacionado ao welcome message
+    localStorage.removeItem('hideWelcomeMessage');
+
+    // Adiciona um marcador para indicar que o usuário acabou de logar
+    sessionStorage.setItem('justLoggedIn', 'true');
   };
 
   const toggleSidebar = () => {
@@ -61,45 +66,45 @@ const SidebarTeacher = () => {
   };
 
   // Efeito para buscar os dados do professor ao montar o componente
- useEffect(() => {
-  const fetchTeacherData = async () => {
-    try {
-      // Obtém o token do localStorage
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("Token não encontrado");
+  useEffect(() => {
+    const fetchTeacherData = async () => {
+      try {
+        // Obtém o token do localStorage
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Token não encontrado");
 
-      // Decodifica o token para obter o ID do usuário
-      const decoded: any = jwtDecode(token);
-      const userId = decoded?.sub;
-      if (!userId) throw new Error("ID do usuário não encontrado no token");
+        // Decodifica o token para obter o ID do usuário
+        const decoded: any = jwtDecode(token);
+        const userId = decoded?.sub;
+        if (!userId) throw new Error("ID do usuário não encontrado no token");
 
-      // Faz requisição para a API
-      const response = await fetch(
-        `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${userId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        // Faz requisição para a API
+        const response = await fetch(
+          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      if (!response.ok) throw new Error("Erro ao buscar dados do docente");
+        if (!response.ok) throw new Error("Erro ao buscar dados do docente");
 
-      // Processa os dados e atualiza o estado (pegando apenas o primeiro nome)
-      const data = await response.json();
-      const firstName = data.nomeDocente ? data.nomeDocente.split(' ')[0] : "Docente";
-      setDocenteName(firstName);
-    } catch (err: any) {
-      // Tratamento de erros
-      setError(err.message || "Erro ao buscar nome do docente");
-    } finally {
-      // Finaliza o estado de carregamento
-      setLoading(false);
-    }
-  };
+        // Processa os dados e atualiza o estado (pegando apenas o primeiro nome)
+        const data = await response.json();
+        const firstName = data.nomeDocente ? data.nomeDocente.split(' ')[0] : "Docente";
+        setDocenteName(firstName);
+      } catch (err: any) {
+        // Tratamento de erros
+        setError(err.message || "Erro ao buscar nome do docente");
+      } finally {
+        // Finaliza o estado de carregamento
+        setLoading(false);
+      }
+    };
 
-  fetchTeacherData();
-}, []);
+    fetchTeacherData();
+  }, []);
 
   return (
     <>
@@ -126,11 +131,9 @@ const SidebarTeacher = () => {
 
       {/* Sidebar */}
       <div
-        className={`${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed 2xl:static z-40 w-64 max-2xl:h-screen bg-white dark:bg-black flex flex-col justify-between rounded-r-[20px] transition-transform duration-300 ease-in-out ${
-          epilogue.className
-        }`}
+        className={`${isOpen ? "translate-x-0" : "-translate-x-full"
+          } fixed 2xl:static z-40 w-64 max-2xl:h-screen bg-white dark:bg-black flex flex-col justify-between rounded-r-[20px] transition-transform duration-300 ease-in-out ${epilogue.className
+          }`}
       >
         <div>
           <div className="flex items-center space-x-4 pb-6 justify-center mt-8">

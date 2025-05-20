@@ -16,7 +16,7 @@ import Sidebar from "@/components/layout/sidebarInstitution";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
@@ -28,7 +28,7 @@ export default function EditClass() {
   const params = useParams();
   // Extrai o ID da turma da URL
   const id = params.id as string;
-  
+
   // Estados para armazenar dados
   const [docentes, setDocentes] = useState([]); // Lista de professores
   const [disciplinas, setDisciplinas] = useState([]); // Lista de disciplinas
@@ -158,9 +158,8 @@ export default function EditClass() {
       <ToastContainer />
       {/* Container principal com fundo condicional (claro/escuro) */}
       <div
-        className={`flex flex-row ${
-          darkMode ? "bg-[#141414]" : "bg-[#F0F7FF]"
-        } min-h-screen`}
+        className={`flex flex-row ${darkMode ? "bg-[#141414]" : "bg-[#F0F7FF]"
+          } min-h-screen`}
       >
         {/* Sidebar */}
         <Sidebar />
@@ -169,20 +168,33 @@ export default function EditClass() {
           <div className="p-8">
             {/* Cabeçalho */}
             <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className={`text-2xl font-bold ${
-                  darkMode ? "text-blue-500" : "text-blue-500"
-                }`}>
+              {/* Botão Voltar - alinhado à esquerda */}
+              <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors flex-shrink-0"
+              >
+                <ArrowLeft size={20} />
+                <span className="hidden sm:inline">Voltar</span>
+              </button>
+
+              {/* Título centralizado - ocupa o espaço disponível */}
+              <div className="flex-1 text-center mx-4">
+                <h1 className={`text-2xl font-bold ${darkMode ? "text-blue-500" : "text-blue-500"
+                  }`}>
                   Editar Turma
                 </h1>
-                <p className={`text-sm ${
-                  darkMode ? "text-gray-400" : "text-gray-500"
-                }`}>
+                <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"
+                  }`}>
                   Preencha os campos abaixo para editar a turma.
                 </p>
               </div>
-              {/* Botão para alternar tema */}
-              <Button onClick={toggleTheme}>
+
+              {/* Botão Tema - alinhado à direita */}
+              <Button
+                onClick={toggleTheme}
+                className="flex-shrink-0"
+                variant="ghost"
+              >
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </Button>
             </div>

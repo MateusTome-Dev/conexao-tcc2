@@ -1,22 +1,35 @@
 "use client"
-
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/alunos/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/alunos/table";
 import { useParams } from 'next/navigation';
 
 export function OccurrencesTable() {
   const params = useParams();
-  const id = params.id as string; // Extrai o ID da URL
+  const id = params.id as string;
   const [feedback, setFeedback] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (id) {
-      // Faz a requisição à API
+      setLoading(true);
       fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/feedbackteacher/student/${id}`)
-        .then(response => response.json())
-        .then(data => setFeedback(data))
-        .catch(error => console.error('Erro ao buscar feedback:', error));
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao buscar feedback');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setFeedback(Array.isArray(data) ? data : []);
+          setError(null);
+        })
+        .catch(error => {
+          console.error('Erro ao buscar feedback:', error);
+          setError(error.message);
+          setFeedback([]);
+        })
+        .finally(() => setLoading(false));
     }
   }, [id]);
 
@@ -32,12 +45,36 @@ export function OccurrencesTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {feedback.map((item) => (
-                <TableRow key={item.id}>
-                  <TableHead className="dark:bg-[#141414] dark:text-[#ffffffd8] min-w-[150px]">{item.conteudo}</TableHead>
-                  <TableHead className="dark:bg-[#141414] dark:text-[#ffffffd8] min-w-[150px]">{item.teacher.nomeDocente}</TableHead>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center py-4 dark:bg-[#141414] dark:text-[#ffffffd8]">
+                    Carregando feedbacks...
+                  </TableCell>
                 </TableRow>
-              ))}
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center py-4 dark:bg-[#141414] dark:text-[#ffffffd8] text-red-500">
+                    Erro ao carregar feedbacks: {error}
+                  </TableCell>
+                </TableRow>
+              ) : feedback.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center py-4 dark:bg-[#141414] dark:text-[#ffffffd8]">
+                    Nenhum feedback encontrado para este aluno.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                feedback.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="dark:bg-[#141414] dark:text-[#ffffffd8] min-w-[150px]">
+                      {item.conteudo}
+                    </TableCell>
+                    <TableCell className="dark:bg-[#141414] dark:text-[#ffffffd8] min-w-[150px]">
+                      {item.teacher?.nomeDocente || 'Não informado'}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

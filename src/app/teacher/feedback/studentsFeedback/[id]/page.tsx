@@ -1,7 +1,7 @@
 "use client"; // Indica que este é um componente do lado do cliente no Next.js
 
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react"; // Ícones para tema claro/escuro
+import { Moon, Sun, ArrowLeft } from "lucide-react"; // Ícones para tema claro/escuro
 import { Button } from "@/components/ui/alunos/button"; // Componente de botão personalizado
 import Sidebar from "@/components/layout/sidebarTeacher"; // Barra lateral do professor
 import SearchInput from "@/components/ui/search"; // Componente de busca
@@ -9,6 +9,7 @@ import { useParams } from "next/navigation"; // Hook para acessar parâmetros da
 import Link from "next/link"; // Componente para navegação
 import { useTheme } from "@/components/ThemeProvider"; // Contexto do tema
 import Image from "next/image"; // Componente de imagem otimizada
+import { useRouter } from 'next/navigation';
 
 // Interface para definir a estrutura de um aluno
 interface Student {
@@ -39,6 +40,7 @@ export default function TeacherList({
   const [currentPage, setCurrentPage] = useState(1); // Página atual da paginação
   const studentsPerPage = 6; // Número de alunos por página
   const { darkMode, toggleTheme } = useTheme(); // Controle do tema
+  const router = useRouter();
 
   // Reseta a página atual quando o termo de busca muda
   useEffect(() => {
@@ -94,15 +96,28 @@ export default function TeacherList({
       
       {/* Conteúdo principal */}
       <div className="w-full flex flex-col items-center mt-8">
-        {/* Botão para alternar tema */}
-        <div className="w-full flex justify-end mb-8 mr-28">
-          <Button 
-            onClick={toggleTheme}
-            aria-label={darkMode ? "Light mode" : "Dark mode"}
-            variant="ghost"
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </Button>
+       {/* Botão para alternar tema */}
+       <div className="grid grid-cols-3 items-center mb-6 w-full">
+          {/* Botão Voltar (esquerda) */}
+          <div className="col-start-1">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+            >
+              <ArrowLeft size={20} />
+              Voltar
+            </button>
+          </div>
+
+          {/* Espaço vazio do meio */}
+          <div className="col-start-2"></div>
+
+          {/* Botão Tema (direita) */}
+          <div className="col-start-3 flex justify-end">
+            <Button onClick={toggleTheme}>
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </Button>
+          </div>
         </div>
 
         {/* Container principal */}

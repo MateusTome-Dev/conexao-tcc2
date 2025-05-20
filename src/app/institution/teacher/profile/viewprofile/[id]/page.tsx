@@ -3,7 +3,7 @@
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { ProfileInfo } from "@/components/ui/teacher/profile";
 import { Button } from "@/components/ui/alunos/button";
-import { Moon, Sun, Pencil, Ban } from "lucide-react";
+import { Moon, Sun, Pencil, Ban, ArrowLeft } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import {
@@ -52,7 +52,7 @@ export default function User() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeacherId, setSelectedTeacherId] = useState<number | null>(null);
-  
+
   // Getting URL parameters and router instance
   const params = useParams();
   const id = params.id as string;
@@ -167,18 +167,26 @@ export default function User() {
     <>
       {/* Toast notifications container */}
       <ToastContainer />
-      
+
       {/* Main page container */}
       <div className={`flex flex-row ${darkMode ? "bg-[#141414]" : "bg-[#F0F7FF]"} min-h-screen`}>
         {/* Sidebar component */}
         <Sidebar />
-        
+
         {/* Main content area */}
         <main className="flex-1 p-8">
           {/* Profile container with dark mode support */}
           <div className="space-y-6 bg-white dark:bg-black dark:text-white p-8 rounded-2xl">
             {/* Theme toggle button */}
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-between">  {/* Alterado de justify-end para justify-between */}
+              <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 p-2 font-bold rounded-full text-blue-500"
+              >
+                <ArrowLeft size={20} />
+                <span>Voltar</span>
+              </button>
+
               <Button onClick={toggleTheme}>
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </Button>
@@ -188,7 +196,7 @@ export default function User() {
             {docenteData && (
               <>
                 <ProfileInfo
-                  imageUrl={docenteData.imageUrl} 
+                  imageUrl={docenteData.imageUrl}
                   name={docenteData.nomeDocente}
                   email={docenteData.emailDocente}
                   birthDate={docenteData.dataNascimentoDocente}
