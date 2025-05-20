@@ -52,6 +52,11 @@ const SidebarInstitution = () => {
     Cookies.remove("token");
     setIsModalOpen(false);
     router.push("/");
+    // Limpa o localStorage relacionado ao welcome message
+    localStorage.removeItem('hideWelcomeMessage');
+
+    // Adiciona um marcador para indicar que o usuário acabou de logar
+    sessionStorage.setItem('justLoggedIn', 'true');
   };
 
   const toggleSidebar = () => {
@@ -83,11 +88,9 @@ const SidebarInstitution = () => {
 
       {/* Sidebar */}
       <div
-        className={`${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed 2xl:static z-40 w-64 max-2xl:h-screen bg-white dark:bg-black flex flex-col justify-between rounded-r-[20px] transition-transform duration-300 ease-in-out ${
-          epilogue.className
-        }`}
+        className={`${isOpen ? "translate-x-0" : "-translate-x-full"
+          } fixed 2xl:static z-40 w-64 max-2xl:h-screen bg-white dark:bg-black flex flex-col justify-between rounded-r-[20px] transition-transform duration-300 ease-in-out ${epilogue.className
+          }`}
       >
         <div>
           <div className="flex items-center space-x-4 pb-6 justify-center mt-8">
@@ -114,7 +117,7 @@ const SidebarInstitution = () => {
                   <span className="group-hover:text-blue-500">Home</span>
                 </Link>
               </li>
-               <li className="group pt-4 pb-4 short:pt-3 short:pb-3 flex flex-row justify-center hover:bg-[#F0F7FF] hover:text-blue-500 dark:hover:bg-[#141414] hover:border-l-4 border-blue-500">
+              <li className="group pt-4 pb-4 short:pt-3 short:pb-3 flex flex-row justify-center hover:bg-[#F0F7FF] hover:text-blue-500 dark:hover:bg-[#141414] hover:border-l-4 border-blue-500">
                 <Link
                   href="/institution/teacher"
                   className="flex items-center space-x-2 text-gray-500 w-32 text-center text-base font-semibold"
