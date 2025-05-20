@@ -8,6 +8,7 @@ import Sidebar from "@/components/layout/sidebarInstitution";
 import SearchInput from "@/components/ui/search";
 import { useParams } from "next/navigation";
 import FloatingButtonClass from "@/components/ui/institution/floatingButtonClass";
+import GlobalTablePerformance from "@/components/ui/globalTablePerformance";
 import { useTheme } from "@/components/ThemeProvider";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -201,6 +202,7 @@ export default function StudentsPage({
               ))}
             </div>
           )}
+          <GlobalTablePerformance/>
         </div>
       </div>
 
