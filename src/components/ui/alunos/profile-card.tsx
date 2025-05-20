@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/alunos/avatar";
 
 interface StudentProfile {
-  imageUrl: string;
+  imageUrl?: string;
   nome: string;
   emailAluno: string;
   matriculaAluno: string;
@@ -14,13 +14,22 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard({ studentData, loading, error }: ProfileCardProps) {
-  // Exibir mensagem de carregamento
+  const getInitials = (name: string) => {
+    if (!name) return "?";
+    const names = name.split(" ");
+    return names
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
       <div className="w-full rounded-lg bg-gradient-to-r from-blue-400 to-blue-300 p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
-            <AvatarFallback>...</AvatarFallback>
+            <AvatarFallback className="bg-gray-300 text-gray-600">...</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <h2 className="text-lg font-semibold text-white">Carregando...</h2>
@@ -30,13 +39,12 @@ export function ProfileCard({ studentData, loading, error }: ProfileCardProps) {
     );
   }
 
-  // Exibir mensagem de erro
   if (error) {
     return (
       <div className="w-full rounded-lg bg-gradient-to-r from-blue-400 to-blue-300 p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
-            <AvatarFallback>!</AvatarFallback>
+            <AvatarFallback className="bg-red-100 text-red-600">!</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <h2 className="text-lg font-semibold text-white">Erro</h2>
@@ -47,17 +55,17 @@ export function ProfileCard({ studentData, loading, error }: ProfileCardProps) {
     );
   }
 
-  // Exibir os dados do estudante
   return (
     <div className="w-full rounded-lg bg-gradient-to-r from-blue-400 to-blue-300 p-4">
       <div className="flex items-center gap-2">
         <Avatar className="h-12 w-12">
-          <AvatarImage src={studentData.imageUrl || "https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-855.jpg?t=st=1738800543~exp=1738804143~hmac=5400a6f0c02663ed6f91ff172c490ed49dbd456d03bed9e4c98b2aed06b0dfdb&w=826"} />
-          <AvatarFallback>
-            {studentData?.nome
-              ?.split(" ")
-              .map((n) => n[0])
-              .join("")}
+          {studentData?.imageUrl ? (
+            <AvatarImage src={studentData.imageUrl} alt={`Foto de ${studentData.nome}`} />
+          ) : (
+            <span className="sr-only">Sem foto</span>
+          )}
+          <AvatarFallback className="bg-white/20 text-white">
+            {getInitials(studentData?.nome || "?")}
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
