@@ -9,9 +9,14 @@ import WelcomeMessage from "@/components/ui/welcomeMessage";
 import { NoticeCard } from "@/components/ui/institution/noticeCard";
 import LateralCalendar from "@/components/ui/lateralCalendar";
 import { useTheme } from "@/components/ThemeProvider";
+import { jwtDecode } from "jwt-decode";
 
 // Main dashboard component for Institution
 export default function DashboardTeacher() {
+
+  const [nameInstitution, setNameInstitution] = useState<string>("Instituição");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   // Theme management using custom hook
   const { darkMode, toggleTheme } = useTheme();
   
@@ -29,6 +34,56 @@ export default function DashboardTeacher() {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
+   useEffect(() => {
+      const fetchInstitutionData = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            throw new Error("Token não encontrado no localStorage");
+          }
+    
+          const decoded: any = jwtDecode(token);
+          const userId = decoded?.sub;
+          if (!userId) {
+            throw new Error("ID do usuário não encontrado no token");
+          }
+    
+          const apiUrl = `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/institution/${userId}`;
+          
+          console.log("Fazendo requisição para:", apiUrl); // Debug
+    
+          const response = await fetch(apiUrl, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+    
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(
+              errorData?.message || `Erro HTTP: ${response.status}`
+            );
+          }
+    
+          const data = await response.json();
+          console.log("Dados recebidos:", data); // Debug
+          
+          if (data.nameInstitution) {
+            setNameInstitution(data.nameInstitution);
+          } else {
+            throw new Error("Nome da instituição não encontrado na resposta");
+          }
+        } catch (err: any) {
+          console.error("Erro ao buscar dados da instituição:", err);
+          setError(err.message);
+          setNameInstitution("Instituição"); // Fallback
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      fetchInstitutionData();
+    }, []);
   return (
     // Main container with dynamic background based on theme
     <div className={`flex ${darkMode ? "bg-[#141414] text-white" : "bg-[#F0F7FF] text-black"}`}>
@@ -46,7 +101,7 @@ export default function DashboardTeacher() {
 
         {/* Welcome message section */}
         <div className="flex flex-row items-center">
-          <WelcomeMessage name="Instituição" />
+          <WelcomeMessage name={nameInstitution} />
         </div>
 
         {/* Notice card component with refresh capability */}
