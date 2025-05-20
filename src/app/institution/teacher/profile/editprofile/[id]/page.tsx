@@ -301,7 +301,7 @@ export default function TeacherProfileEdit() {
         <Sidebar />
 
         <main className="flex-1 p-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="mb-8">
             <button
               onClick={() => router.back()}
               className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors text-blue-500 dark:text-blue-400 flex-shrink-0"
@@ -309,7 +309,7 @@ export default function TeacherProfileEdit() {
               <ArrowLeft size={20} />
               <span className="hidden sm:inline">Voltar</span>
             </button>
-
+            <div className="flex items-center justify-between">
             <div className="flex-1 text-center mx-4 min-w-0">
               <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400 truncate">
                 Editar Teacher
@@ -329,7 +329,7 @@ export default function TeacherProfileEdit() {
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
           </div>
-
+</div>
           <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-lg shadow">
             <div className="flex items-center gap-4">
               {teacherData.imageUrl ? (

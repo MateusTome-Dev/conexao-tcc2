@@ -267,7 +267,7 @@ export default function EditClass() {
         <main className="flex-1 p-8">
           <div className="p-8">
             {/* Cabeçalho */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="mb-8">
               {/* Botão Voltar - alinhado à esquerda */}
               <button
                 onClick={() => router.back()}
@@ -276,7 +276,7 @@ export default function EditClass() {
                 <ArrowLeft size={20} />
                 <span className="hidden sm:inline">Voltar</span>
               </button>
-
+<div className="flex items-center justify-between">
               {/* Título centralizado - ocupa o espaço disponível */}
               <div className="flex-1 text-center mx-4">
                 <h1
@@ -304,7 +304,7 @@ export default function EditClass() {
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </Button>
             </div>
-
+</div>
             {/* Formulário de edição */}
             <div className="container mx-auto p-6 space-y-6 max-w-5xl h-1/2 bg-[#ffffff] rounded-3xl dark:bg-black">
               {/* Grid com campos básicos da turma */}

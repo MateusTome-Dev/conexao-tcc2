@@ -98,7 +98,7 @@ export default function StudentsPage({
           <div className="col-start-1">
             <button
               onClick={() => router.back()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+              className="flex items-center gap-2 pl-8 pt-8 rounded-lg text-blue-500 font-semibold transition-colors"
             >
               <ArrowLeft size={20} />
               Voltar

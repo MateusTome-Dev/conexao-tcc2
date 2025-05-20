@@ -333,7 +333,7 @@ export default function CSVImporter() {
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
         <Sidebar />
 
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-14">
           {/* Cabeçalho */}
           <div className="flex items-center justify-between mb-8">
             <div>
