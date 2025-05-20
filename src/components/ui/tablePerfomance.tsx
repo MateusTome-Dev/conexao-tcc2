@@ -35,7 +35,7 @@ const EngagementChart: React.FC = () => {
   const [selectedType, setSelectedType] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [creators, setCreators] = useState<Creator[]>([]);
-  const [selectedCreatorId, setSelectedCreatorId] = useState<number | null>(null);
+  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [chartWidth, setChartWidth] = useState<number>(0);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const EngagementChart: React.FC = () => {
       
       // Seleciona o primeiro professor por padrão se existir
       if (dados.length > 0) {
-        setSelectedCreatorId(dados[0].id);
+        setSelectedCreator(dados[0]);
       }
     } catch (err: any) {
       console.error("Erro ao buscar professores:", err);
@@ -127,8 +127,8 @@ const EngagementChart: React.FC = () => {
       }
 
       // Filtra por professor selecionado
-      const filteredByCreator = selectedCreatorId
-        ? dados.filter((item: FeedbackData) => item.createdByDTO?.id === selectedCreatorId)
+      const filteredByCreator = selectedCreator
+        ? dados.filter((item: FeedbackData) => item.createdByDTO?.id === selectedCreator.id)
         : dados;
 
       // Filtra por bimestre selecionado
@@ -181,12 +181,13 @@ const EngagementChart: React.FC = () => {
     if (creators.length > 0 && studentId) {
       fetchData();
     }
-  }, [bimestre, selectedCreatorId, studentId, chartWidth]);
+  }, [bimestre, selectedCreator, studentId, chartWidth]);
 
-  const getSelectedCreatorName = () => {
-    if (!selectedCreatorId) return "Selecione o Professor";
-    const creator = creators.find(c => c.id === selectedCreatorId);
-    return creator ? creator.nomeDocente : "Selecione o Professor";
+  const handleCreatorChange = (nomeDocente: string) => {
+    const creator = creators.find(c => c.nomeDocente === nomeDocente);
+    if (creator) {
+      setSelectedCreator(creator);
+    }
   };
 
   const CustomTooltip = ({ active, payload }: any) => {
@@ -208,15 +209,15 @@ const EngagementChart: React.FC = () => {
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full sm:w-auto">
           <Select
-            onValueChange={(value) => setSelectedCreatorId(Number(value))}
-            value={selectedCreatorId ? String(selectedCreatorId) : ""}
+            onValueChange={handleCreatorChange}
+            value={selectedCreator?.nomeDocente || ""}
           >
             <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder={getSelectedCreatorName()} />
+              <SelectValue placeholder={selectedCreator ? selectedCreator.nomeDocente : "Selecione o Professor"} />
             </SelectTrigger>
             <SelectContent>
               {creators.map((creator) => (
-                <SelectItem key={creator.id} value={String(creator.nomeDocente)}>
+                <SelectItem key={creator.id} value={creator.nomeDocente}>
                   {creator.nomeDocente}
                 </SelectItem>
               ))}
