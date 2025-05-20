@@ -50,7 +50,9 @@ export default function EditClass() {
 
   // Buscar lista de professores da API
   useEffect(() => {
-    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher")
+    fetch(
+      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher"
+    )
       .then((response) => response.json())
       .then((data) => setDocentes(data))
       .catch((error) => console.error("Erro ao buscar docentes:", error));
@@ -58,7 +60,9 @@ export default function EditClass() {
 
   // Buscar lista de disciplinas da API
   useEffect(() => {
-    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline")
+    fetch(
+      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline"
+    )
       .then((response) => response.json())
       .then((data) => setDisciplinas(data))
       .catch((error) => console.error("Erro ao buscar disciplinas:", error));
@@ -82,8 +86,97 @@ export default function EditClass() {
     });
   };
 
+  const LIMITES_CAMPOS = {
+    nomeTurma: 50,
+    salaTurma: 5,
+    capacidadeMaxima: 40,
+  };
+
+  const validarCampos = () => {
+    // Verificação de campos obrigatórios
+    if (!nomeTurma.trim()) {
+      toast.warn("Nome da turma é obrigatório");
+      return false;
+    }
+
+    if (!anoLetivoTurma) {
+      toast.warn("Ano letivo é obrigatório");
+      return false;
+    }
+
+    if (!periodoTurma) {
+      toast.warn("Período é obrigatório");
+      return false;
+    }
+
+    if (!capacidadeTurma) {
+      toast.warn("Capacidade é obrigatória");
+      return false;
+    }
+
+    if (!salaTurma.trim()) {
+      toast.warn("Sala é obrigatória");
+      return false;
+    }
+
+    if (/[a-zA-Z]/.test(salaTurma)) {
+      toast.warn("O número da sala NÃO pode conter letras");
+      return false;
+    }
+
+    // Validação de comprimento máximo
+    if (nomeTurma.length > LIMITES_CAMPOS.nomeTurma) {
+      toast.warn(
+        `Nome da turma deve ter no máximo ${LIMITES_CAMPOS.nomeTurma} caracteres`
+      );
+      return false;
+    }
+
+    if (salaTurma.length > LIMITES_CAMPOS.salaTurma) {
+      toast.warn(
+        `Sala deve ter no máximo ${LIMITES_CAMPOS.salaTurma} caracteres`
+      );
+      return false;
+    }
+
+    // Validação numérica
+    const capacidade = Number(capacidadeTurma);
+    if (isNaN(capacidade)) {
+      toast.warn("Capacidade deve ser um número válido");
+      return false;
+    }
+
+    if (capacidade <= 0) {
+      toast.warn("Capacidade deve ser maior que zero");
+      return false;
+    }
+
+    if (capacidade > LIMITES_CAMPOS.capacidadeMaxima) {
+      toast.warn(
+        `Capacidade máxima permitida é ${LIMITES_CAMPOS.capacidadeMaxima}`
+      );
+      return false;
+    }
+
+        if (idTeachers.length === 0) {
+      toast.warn("Por favor, selecione pelo menos um professor");
+      return false;
+    }
+ 
+    if (disciplineIds.length === 0) {
+      toast.warn("Por favor, selecione pelo menos uma disciplina");
+      return false;
+    }
+
+    return true;
+  };
+
   // Função para enviar os dados atualizados da turma para a API
   const editarTurma = async () => {
+    if (!validarCampos()) {
+      return;
+    }
+
     // Prepara o payload com os dados da turma
     const payload = {
       nomeTurma,
@@ -130,7 +223,9 @@ export default function EditClass() {
     if (!id) return; // Se não houver ID, não faz a requisição
 
     // Busca os dados da turma, professores e disciplinas associadas
-    fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class/teacher/disciplinas/${id}`)
+    fetch(
+      `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class/teacher/disciplinas/${id}`
+    )
       .then((response) => response.json())
       .then((data) => {
         // Preenche os estados com os dados da turma
@@ -141,11 +236,15 @@ export default function EditClass() {
         setSalaTurma(String(data.salaTurma) || "");
 
         // Extrai IDs dos professores associados à turma
-        const teacherIds = data.teachers ? data.teachers.map((teacher) => teacher.id) : [];
+        const teacherIds = data.teachers
+          ? data.teachers.map((teacher) => teacher.id)
+          : [];
         setIdTeachers(teacherIds);
 
         // Extrai IDs das disciplinas associadas à turma
-        const disciplineIds = data.disciplines ? data.disciplines.map((discipline) => discipline.id) : [];
+        const disciplineIds = data.disciplines
+          ? data.disciplines.map((discipline) => discipline.id)
+          : [];
         setDisciplineIds(disciplineIds);
       })
       .catch((error) => console.error("Erro ao buscar turma:", error));
@@ -158,8 +257,9 @@ export default function EditClass() {
       <ToastContainer />
       {/* Container principal com fundo condicional (claro/escuro) */}
       <div
-        className={`flex flex-row ${darkMode ? "bg-[#141414]" : "bg-[#F0F7FF]"
-          } min-h-screen`}
+        className={`flex flex-row ${
+          darkMode ? "bg-[#141414]" : "bg-[#F0F7FF]"
+        } min-h-screen`}
       >
         {/* Sidebar */}
         <Sidebar />
@@ -179,12 +279,18 @@ export default function EditClass() {
 
               {/* Título centralizado - ocupa o espaço disponível */}
               <div className="flex-1 text-center mx-4">
-                <h1 className={`text-2xl font-bold ${darkMode ? "text-blue-500" : "text-blue-500"
-                  }`}>
+                <h1
+                  className={`text-2xl font-bold ${
+                    darkMode ? "text-blue-500" : "text-blue-500"
+                  }`}
+                >
                   Editar Turma
                 </h1>
-                <p className={`text-sm ${darkMode ? "text-gray-400" : "text-gray-500"
-                  }`}>
+                <p
+                  className={`text-sm ${
+                    darkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   Preencha os campos abaixo para editar a turma.
                 </p>
               </div>
@@ -309,7 +415,10 @@ export default function EditClass() {
                             handleTeacherSelection(docente.id)
                           }
                         />
-                        <label htmlFor={`docente-${docente.id}`} className="max-w-64 break-words">
+                        <label
+                          htmlFor={`docente-${docente.id}`}
+                          className="max-w-64 break-words"
+                        >
                           {docente.nomeDocente}
                         </label>
                       </div>

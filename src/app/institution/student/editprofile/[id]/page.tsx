@@ -23,6 +23,36 @@ interface StudentData {
   imageUrl: string;
 }
 
+// CONSTANTS AND VALIDATION FUNCTIONS
+const LIMITES_CAMPOS = {
+  nomeAluno: 50,
+  telefoneAluno: 11, // Máximo 11 dígitos (com DDD)
+  emailAluno: 100
+};
+
+const validateEmail = (email: string): boolean => {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+  if (email.length < 5) return false;
+  if (email.includes(' ')) return false;
+  if (email.length > LIMITES_CAMPOS.emailAluno) return false;
+  
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  if (parts[1].indexOf('.') === -1) return false;
+  
+  return regex.test(email);
+};
+
+const validatePhone = (phone: string) => {
+  const cleanedPhone = phone.replace(/\D/g, '');
+  return cleanedPhone.length >= 10 && cleanedPhone.length <= 11;
+};
+
+const validateName = (name: string) => {
+  return name.trim().length >= 3 && /^[a-zA-ZÀ-ÿ\s']+$/.test(name);
+};
+
 export default function Profile() {
   const params = useParams();
   const id = params.id as string;
@@ -43,56 +73,54 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Função aprimorada para formatar a data do backend para o input date
   const formatDateForInput = (backendDate: string): string => {
     if (!backendDate) return "";
 
-    // Se já estiver no formato correto (YYYY-MM-DD)
     if (/^\d{4}-\d{2}-\d{2}$/.test(backendDate)) {
       return backendDate;
     }
 
-    // Remove qualquer parte de tempo e timezone se existir
     const datePart = backendDate.split('T')[0].split(' ')[0];
-
-    // Cria a data ajustando para o fuso horário local
     const date = new Date(datePart);
     if (isNaN(date.getTime())) return "";
 
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
   };
 
-  // Função para formatar a data para o backend
   const formatDateForBackend = (dateString: string): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000-03:00`;
-  };
-
-  const formatPhone = (value: string): string => {
-    const numbers = value.replace(/\D/g, "");
-    if (numbers.length <= 10) {
-      return numbers
-        .replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-    } else {
-      return numbers
-        .replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-    }
+    return `${year}-${month}-${day}T00:00:00.000Z`;
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedPhone = formatPhone(e.target.value);
-    setStudentData({ ...studentData, phone: formattedPhone });
+    const value = e.target.value;
+    const cleanedValue = value.replace(/\D/g, '');
+    let formattedValue = '';
+    
+    if (cleanedValue.length > 0) {
+      formattedValue = `(${cleanedValue.substring(0, 2)}`;
+      if (cleanedValue.length > 2) {
+        formattedValue += `) ${cleanedValue.substring(2, 7)}`;
+        if (cleanedValue.length > 7) {
+          formattedValue += `-${cleanedValue.substring(7, 11)}`;
+        }
+      }
+    }
+    
+    setStudentData({ ...studentData, phone: formattedValue });
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cleanedValue = e.target.value.replace(/\s/g, '');
+    setStudentData({ ...studentData, email: cleanedValue });
   };
 
   const validateDate = (dateString: string): boolean => {
@@ -127,10 +155,6 @@ export default function Profile() {
 
         const data = await response.json();
 
-        console.log("Dados brutos do backend:", data);
-        console.log("Data de nascimento recebida:", data.dataNascimentoAluno);
-        console.log("Data formatada:", formatDateForInput(data.dataNascimentoAluno));
-
         setStudentData({
           id: data.id,
           name: data.nome || "",
@@ -142,10 +166,6 @@ export default function Profile() {
           imageUrl: data.imageUrl || ""
         });
 
-        console.log("Estado do aluno após carregamento:", {
-          ...studentData,
-          birthDate: formatDateForInput(data.dataNascimentoAluno) || ""
-        });
       } catch (error) {
         console.error("Erro ao buscar dados do aluno:", error);
         toast.error("Falha ao carregar dados do aluno");
@@ -157,20 +177,54 @@ export default function Profile() {
     fetchStudentData();
   }, [id]);
 
-  useEffect(() => {
-    console.log("Data de nascimento atualizada:", studentData.birthDate);
-  }, [studentData.birthDate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!studentData.name || !studentData.email ||
-      !studentData.birthDate || !studentData.phone) {
-      toast.warn("Preencha todos os campos obrigatórios!");
+    setLoading(true);
+    
+    // Validação de campos obrigatórios
+    if (!studentData.name.trim() || !studentData.email || 
+        !studentData.birthDate || !studentData.phone) {
+      toast.warn("Preencha todos os campos obrigatórios.");
+      setLoading(false);
       return;
     }
 
+    // Validação do nome
+    if (!validateName(studentData.name)) {
+      toast.warn("Nome deve conter apenas letras e ter pelo menos 3 caracteres");
+      setLoading(false);
+      return;
+    }
+
+    if (studentData.name.length > LIMITES_CAMPOS.nomeAluno) {
+      toast.warn(`Nome deve ter no máximo ${LIMITES_CAMPOS.nomeAluno} caracteres`);
+      setLoading(false);
+      return;
+    }
+
+    // Validação do email
+    if (!validateEmail(studentData.email)) {
+      if (studentData.email.includes(' ')) {
+        toast.warn("Email não pode conter espaços");
+      } else if (studentData.email.length > LIMITES_CAMPOS.emailAluno) {
+        toast.warn(`Email deve ter no máximo ${LIMITES_CAMPOS.emailAluno} caracteres`);
+      } else {
+        toast.warn("Por favor, insira um email válido");
+      }
+      setLoading(false);
+      return;
+    }
+
+    // Validação da data de nascimento
     if (!validateDate(studentData.birthDate)) {
+      setLoading(false);
+      return;
+    }
+
+    // Validação do telefone
+    if (!validatePhone(studentData.phone)) {
+      toast.warn("Telefone deve ter 10 ou 11 dígitos (com DDD)");
+      setLoading(false);
       return;
     }
 
@@ -186,7 +240,7 @@ export default function Profile() {
           },
           body: JSON.stringify({
             imageUrl: studentData.imageUrl,
-            nomeAluno: studentData.name,
+            nomeAluno: studentData.name.trim(),
             emailAluno: studentData.email,
             dataNascimentoAluno: formatDateForBackend(studentData.birthDate),
             telefoneAluno: studentData.phone.replace(/\D/g, ""),
@@ -203,8 +257,13 @@ export default function Profile() {
       toast.success("Aluno atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar aluno:", error);
-      toast.error(error instanceof Error ? error.message : "Falha ao atualizar aluno");
+      if (error.message.includes("email")) {
+        toast.error("Este email já está cadastrado");
+      } else {
+        toast.error(error instanceof Error ? error.message : "Falha ao atualizar aluno");
+      }
     } finally {
+      setLoading(false);
       setIsModalOpen(false);
     }
   };
@@ -235,7 +294,6 @@ export default function Profile() {
 
         <main className="flex-1 p-8">
           <div className="flex items-center justify-between mb-8 relative">
-            {/* Botão Voltar - alinhado à esquerda */}
             <button
               onClick={() => router.back()}
               className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors text-blue-500 dark:text-blue-400 z-10"
@@ -244,7 +302,6 @@ export default function Profile() {
               <span className="hidden sm:inline">Voltar</span>
             </button>
 
-            {/* Título Centralizado Absolutamente */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
                 <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400">
@@ -256,7 +313,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Botão Tema - alinhado à direita */}
             <div className="z-10">
               <Button
                 onClick={toggleTheme}
@@ -314,7 +370,7 @@ export default function Profile() {
                   value={studentData.name}
                   onChange={(e) => setStudentData({ ...studentData, name: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                  maxLength={100}
+                  maxLength={LIMITES_CAMPOS.nomeAluno}
                   required
                 />
               </div>
@@ -341,9 +397,9 @@ export default function Profile() {
                 <Input
                   type="email"
                   value={studentData.email}
-                  onChange={(e) => setStudentData({ ...studentData, email: e.target.value })}
+                  onChange={handleEmailChange}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                  maxLength={100}
+                  maxLength={LIMITES_CAMPOS.emailAluno}
                   required
                 />
               </div>

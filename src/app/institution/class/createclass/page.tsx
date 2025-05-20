@@ -37,7 +37,9 @@ export default function CreateClass() {
 
   // Efeito para buscar a lista de professores ao carregar o componente
   useEffect(() => {
-    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher")
+    fetch(
+      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher"
+    )
       .then((response) => response.json())
       .then((data) => setDocentes(data))
       .catch((error) => console.error("Erro ao buscar docentes:", error));
@@ -45,7 +47,9 @@ export default function CreateClass() {
 
   // Efeito para buscar a lista de disciplinas ao carregar o componente
   useEffect(() => {
-    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline")
+    fetch(
+      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline"
+    )
       .then((response) => response.json())
       .then((data) => setDisciplinas(data))
       .catch((error) => console.error("Erro ao buscar disciplinas:", error));
@@ -71,6 +75,92 @@ export default function CreateClass() {
     );
   };
 
+  const LIMITES_CAMPOS = {
+    nomeTurma: 50,
+    salaTurma: 5,
+    capacidadeMaxima: 40,
+  };
+
+  const validarCampos = () => {
+    // Verificação de campos obrigatórios
+    if (!nomeTurma.trim()) {
+      toast.warn("Nome da turma é obrigatório");
+      return false;
+    }
+
+    if (!anoLetivoTurma) {
+      toast.warn("Ano letivo é obrigatório");
+      return false;
+    }
+
+    if (!periodoTurma) {
+      toast.warn("Período é obrigatório");
+      return false;
+    }
+
+    if (!capacidadeTurma) {
+      toast.warn("Capacidade é obrigatória");
+      return false;
+    }
+
+    if (!salaTurma.trim()) {
+      toast.warn("Sala é obrigatória");
+      return false;
+    }
+
+    if (/[a-zA-Z]/.test(salaTurma)) {
+      toast.warn("O número da sala NÃO pode conter letras");
+      return false;
+    }
+
+    // Validação de comprimento máximo
+    if (nomeTurma.length > LIMITES_CAMPOS.nomeTurma) {
+      toast.warn(
+        `Nome da turma deve ter no máximo ${LIMITES_CAMPOS.nomeTurma} caracteres`
+      );
+      return false;
+    }
+
+    if (salaTurma.length > LIMITES_CAMPOS.salaTurma) {
+      toast.warn(
+        `Sala deve ter no máximo ${LIMITES_CAMPOS.salaTurma} caracteres`
+      );
+      return false;
+    }
+
+    // Validação numérica
+    const capacidade = Number(capacidadeTurma);
+    if (isNaN(capacidade)) {
+      toast.warn("Capacidade deve ser um número válido");
+      return false;
+    }
+
+    if (capacidade <= 0) {
+      toast.warn("Capacidade deve ser maior que zero");
+      return false;
+    }
+
+    if (capacidade > LIMITES_CAMPOS.capacidadeMaxima) {
+      toast.warn(
+        `Capacidade máxima permitida é ${LIMITES_CAMPOS.capacidadeMaxima}`
+      );
+      return false;
+    }
+
+    // Validação de seleção
+    if (idTeacher.length === 0) {
+      toast.warn("Selecione pelo menos um professor");
+      return false;
+    }
+
+    if (disciplineId.length === 0) {
+      toast.warn("Selecione pelo menos uma disciplina");
+      return false;
+    }
+
+    return true;
+  };
+
   // Função principal para criar uma nova turma
   const criarTurma = async () => {
     const token = localStorage.getItem("token");
@@ -81,19 +171,10 @@ export default function CreateClass() {
       toast.warn("Usuário não autenticado. Faça login novamente.");
       return;
     }
-
-    // Validação dos campos obrigatórios
-    if (
-      !nomeTurma ||
-      !anoLetivoTurma ||
-      !periodoTurma ||
-      !capacidadeTurma ||
-      !salaTurma
-    ) {
-      console.error("❌ O ano letivo está vazio!");
-      toast.warn("Preencha todos os campos.");
-      return;
-    }
+    
+    if (!validarCampos()) {
+        return;
+      }
 
     // Preparação do payload para a API
     const payload = {
@@ -108,15 +189,18 @@ export default function CreateClass() {
 
     try {
       // Chamada para a API para criar a turma
-      const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      
+      const response = await fetch(
+        "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
       // Verifica se a resposta foi bem-sucedida
       if (!response.ok) {
         throw new Error("Erro ao criar a turma.");
@@ -143,7 +227,7 @@ export default function CreateClass() {
     <>
       {/* Container para as notificações toast */}
       <ToastContainer />
-      
+
       {/* Estrutura principal da página */}
       <div
         className={`flex flex-row ${
@@ -152,21 +236,25 @@ export default function CreateClass() {
       >
         {/* Barra lateral */}
         <Sidebar />
-        
+
         {/* Conteúdo principal */}
         <main className="flex-1 p-8">
           <div className="p-8">
             {/* Cabeçalho */}
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className={`text-2xl font-bold ${
-                  darkMode ? "text-blue-500" : "text-blue-500"
-                }`}>
+                <h1
+                  className={`text-2xl font-bold ${
+                    darkMode ? "text-blue-500" : "text-blue-500"
+                  }`}
+                >
                   Criar Nova Turma
                 </h1>
-                <p className={`text-sm ${
-                  darkMode ? "text-gray-400" : "text-gray-500"
-                }`}>
+                <p
+                  className={`text-sm ${
+                    darkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   Preencha os campos abaixo para criar uma nova turma.
                 </p>
               </div>
@@ -177,18 +265,22 @@ export default function CreateClass() {
             </div>
 
             {/* Formulário para criação de turma */}
-            <div className={`container mx-auto p-6 space-y-6 max-w-5xl ${
-              darkMode ? "bg-black text-white" : "bg-white text-black"
-            } rounded-3xl`}>
+            <div
+              className={`container mx-auto p-6 space-y-6 max-w-5xl ${
+                darkMode ? "bg-black text-white" : "bg-white text-black"
+              } rounded-3xl`}
+            >
               {/* Primeira linha de campos */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Coluna esquerda */}
                 <div className="space-y-4">
                   {/* Campo para nome da turma */}
                   <div>
-                    <label className={`text-sm ${
-                      darkMode ? "text-gray-400" : "text-muted-foreground"
-                    }`}>
+                    <label
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-muted-foreground"
+                      }`}
+                    >
                       Nome da turma
                     </label>
                     <Input
@@ -205,9 +297,11 @@ export default function CreateClass() {
 
                   {/* Seletor de período */}
                   <div>
-                    <label className={`text-sm ${
-                      darkMode ? "text-gray-400" : "text-muted-foreground"
-                    }`}>
+                    <label
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-muted-foreground"
+                      }`}
+                    >
                       Período
                     </label>
                     <Select
@@ -237,9 +331,11 @@ export default function CreateClass() {
                 <div className="space-y-4">
                   {/* Seletor de ano letivo */}
                   <div>
-                    <label className={`text-sm ${
-                      darkMode ? "text-gray-400" : "text-muted-foreground"
-                    }`}>
+                    <label
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-muted-foreground"
+                      }`}
+                    >
                       Ano letivo
                     </label>
                     <Select
@@ -266,9 +362,11 @@ export default function CreateClass() {
                   {/* Campos de capacidade e sala */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className={`text-sm ${
-                        darkMode ? "text-gray-400" : "text-muted-foreground"
-                      }`}>
+                      <label
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-muted-foreground"
+                        }`}
+                      >
                         Capacidade máxima
                       </label>
                       <Input
@@ -283,9 +381,11 @@ export default function CreateClass() {
                       />
                     </div>
                     <div>
-                      <label className={`text-sm ${
-                        darkMode ? "text-gray-400" : "text-muted-foreground"
-                      }`}>
+                      <label
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-muted-foreground"
+                        }`}
+                      >
                         N° da sala
                       </label>
                       <Input
@@ -306,9 +406,11 @@ export default function CreateClass() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Lista de professores */}
                 <div>
-                  <h3 className={`text-sm ${
-                    darkMode ? "text-gray-400" : "text-muted-foreground"
-                  } mb-4`}>
+                  <h3
+                    className={`text-sm ${
+                      darkMode ? "text-gray-400" : "text-muted-foreground"
+                    } mb-4`}
+                  >
                     Seleção de docentes
                   </h3>
                   <div className="space-y-3">
@@ -325,7 +427,10 @@ export default function CreateClass() {
                           }
                           className={darkMode ? "text-white" : ""}
                         />
-                        <label htmlFor={`docente-${docente.id}`} className="max-w-64 break-words">
+                        <label
+                          htmlFor={`docente-${docente.id}`}
+                          className="max-w-64 break-words"
+                        >
                           {docente.nomeDocente}
                         </label>
                       </div>
@@ -335,9 +440,11 @@ export default function CreateClass() {
 
                 {/* Lista de disciplinas */}
                 <div>
-                  <h3 className={`text-sm ${
-                    darkMode ? "text-gray-400" : "text-muted-foreground"
-                  } mb-4`}>
+                  <h3
+                    className={`text-sm ${
+                      darkMode ? "text-gray-400" : "text-muted-foreground"
+                    } mb-4`}
+                  >
                     Seleção de disciplinas
                   </h3>
                   <div className="space-y-3">

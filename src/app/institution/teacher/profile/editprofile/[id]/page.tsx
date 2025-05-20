@@ -12,6 +12,36 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import ModalCreate from "@/components/modals/modalCreate";
 
+// CONSTANTS AND VALIDATION FUNCTIONS
+const LIMITES_CAMPOS = {
+  nomeDocente: 50,
+  telefoneDocente: 11, // Máximo 11 dígitos (com DDD)
+  emailDocente: 100
+};
+
+const validateEmail = (email: string): boolean => {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+  if (email.length < 5) return false;
+  if (email.includes(' ')) return false;
+  if (email.length > LIMITES_CAMPOS.emailDocente) return false;
+  
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  if (parts[1].indexOf('.') === -1) return false;
+  
+  return regex.test(email);
+};
+
+const validatePhone = (phone: string) => {
+  const cleanedPhone = phone.replace(/\D/g, '');
+  return cleanedPhone.length >= 10 && cleanedPhone.length <= 11;
+};
+
+const validateName = (name: string) => {
+  return name.trim().length >= 3 && /^[a-zA-ZÀ-ÿ\s']+$/.test(name);
+};
+
 interface TeacherData {
   id: number;
   name: string;
@@ -38,6 +68,7 @@ export default function TeacherProfileEdit() {
 
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Função aprimorada para formatar a data do backend para o input date
   const formatDateForInput = (backendDate: string): string => {
@@ -57,7 +88,7 @@ export default function TeacherProfileEdit() {
 
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
   };
@@ -99,12 +130,20 @@ export default function TeacherProfileEdit() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Validação de idade mínima (18 anos)
+    const minAgeDate = new Date();
+    minAgeDate.setFullYear(minAgeDate.getFullYear() - 18);
+
     if (selectedDate < minDate) {
       toast.warn("Data de nascimento não pode ser anterior a 1900");
       return false;
     }
     if (selectedDate > today) {
       toast.warn("Data de nascimento não pode ser no futuro");
+      return false;
+    }
+    if (selectedDate > minAgeDate) {
+      toast.warn("O docente deve ter pelo menos 18 anos");
       return false;
     }
     return true;
@@ -135,12 +174,6 @@ export default function TeacherProfileEdit() {
           phone: data.telefoneDocente || "",
           imageUrl: data.imageUrl || ""
         });
-
-        // Log do estado após atualização
-        console.log("Estado do professor após carregamento:", {
-          ...teacherData,
-          birthDate: formatDateForInput(data.dataNascimentoDocente) || ""
-        });
       } catch (error) {
         console.error("Erro ao buscar dados do professor:", error);
         toast.error("Falha ao carregar dados do professor");
@@ -152,37 +185,79 @@ export default function TeacherProfileEdit() {
     fetchTeacherData();
   }, [id]);
 
-  // Efeito para monitorar mudanças na data de nascimento
-  useEffect(() => {
-    console.log("Data de nascimento atualizada:", teacherData.birthDate);
-  }, [teacherData.birthDate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!teacherData.name || !teacherData.email ||
-      !teacherData.birthDate || !teacherData.phone) {
-      toast.warn("Preencha todos os campos!");
+    setIsSubmitting(true);
+    
+    // Validação de campos obrigatórios
+    if (!teacherData.name.trim() || !teacherData.email || 
+        !teacherData.birthDate || !teacherData.phone) {
+      toast.warn("Preencha todos os campos obrigatórios.");
+      setIsSubmitting(false);
       return;
     }
 
+    // Validação do nome
+    if (!validateName(teacherData.name)) {
+      toast.warn("Nome deve conter apenas letras e ter pelo menos 3 caracteres");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (teacherData.name.length > LIMITES_CAMPOS.nomeDocente) {
+      toast.warn(`Nome deve ter no máximo ${LIMITES_CAMPOS.nomeDocente} caracteres`);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validação do email
+    if (!validateEmail(teacherData.email)) {
+      if (teacherData.email.includes(' ')) {
+        toast.warn("Email não pode conter espaços");
+      } else if (teacherData.email.length > LIMITES_CAMPOS.emailDocente) {
+        toast.warn(`Email deve ter no máximo ${LIMITES_CAMPOS.emailDocente} caracteres`);
+      } else {
+        toast.warn("Por favor, insira um email válido (exemplo: nome@dominio.com)");
+      }
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validação da data de nascimento
     if (!validateDate(teacherData.birthDate)) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validação do telefone
+    if (!validatePhone(teacherData.phone)) {
+      toast.warn("Telefone deve ter 10 ou 11 dígitos (com DDD)");
+      setIsSubmitting(false);
       return;
     }
 
     setIsModalOpen(true);
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.warn("Usuário não autenticado. Faça login novamente.");
+        setIsSubmitting(false);
+        setIsModalOpen(false);
+        return;
+      }
+
       const response = await fetch(
         `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             imageUrl: teacherData.imageUrl,
-            nomeDocente: teacherData.name,
+            nomeDocente: teacherData.name.trim(),
             emailDocente: teacherData.email,
             dataNascimentoDocente: formatDateForBackend(teacherData.birthDate),
             telefoneDocente: teacherData.phone.replace(/\D/g, "")
@@ -193,6 +268,8 @@ export default function TeacherProfileEdit() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Falha ao atualizar professor");
+      } else if (response.status === 400) {
+        toast.warn("Email já cadastrado! Por favor, utilize um email diferente.");
       }
 
       toast.success("Professor atualizado com sucesso!");
@@ -201,20 +278,15 @@ export default function TeacherProfileEdit() {
       }, 2000);
     } catch (error) {
       console.error("Erro ao atualizar professor:", error);
-      toast.error(error instanceof Error ? error.message : "Falha ao atualizar professor");
+      if (error instanceof Error && error.message.includes("email")) {
+        toast.error("Este email já está cadastrado");
+      } else {
+        toast.error(error instanceof Error ? error.message : "Erro ao atualizar professor");
+      }
     } finally {
+      setIsSubmitting(false);
       setIsModalOpen(false);
     }
-  };
-
-  const getCurrentDate = (): string => {
-    const today = new Date();
-    return today.toLocaleDateString("pt-BR", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   useEffect(() => {
@@ -230,7 +302,6 @@ export default function TeacherProfileEdit() {
 
         <main className="flex-1 p-8">
           <div className="flex items-center justify-between mb-8">
-            {/* Botão Voltar - alinhado à esquerda */}
             <button
               onClick={() => router.back()}
               className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors text-blue-500 dark:text-blue-400 flex-shrink-0"
@@ -239,7 +310,6 @@ export default function TeacherProfileEdit() {
               <span className="hidden sm:inline">Voltar</span>
             </button>
 
-            {/* Container central para o título - ocupa o espaço disponível */}
             <div className="flex-1 text-center mx-4 min-w-0">
               <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400 truncate">
                 Editar Teacher
@@ -249,7 +319,6 @@ export default function TeacherProfileEdit() {
               </p>
             </div>
 
-            {/* Botão Tema - alinhado à direita */}
             <Button
               onClick={toggleTheme}
               variant="ghost"
@@ -287,6 +356,10 @@ export default function TeacherProfileEdit() {
                   onChange={(e) => {
                     if (e.target.files?.[0]) {
                       const file = e.target.files[0];
+                      if (file.size > 2 * 1024 * 1024) {
+                        toast.warn("A imagem deve ter no máximo 2MB");
+                        return;
+                      }
                       const reader = new FileReader();
                       reader.onload = (event) =>
                         setTeacherData({ ...teacherData, imageUrl: event.target?.result as string });
@@ -315,7 +388,7 @@ export default function TeacherProfileEdit() {
                   value={teacherData.name}
                   onChange={(e) => setTeacherData({ ...teacherData, name: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                  maxLength={100}
+                  maxLength={LIMITES_CAMPOS.nomeDocente}
                   required
                 />
               </div>
@@ -342,9 +415,10 @@ export default function TeacherProfileEdit() {
                 <Input
                   type="email"
                   value={teacherData.email}
-                  onChange={(e) => setTeacherData({ ...teacherData, email: e.target.value })}
+                  onChange={(e) => setTeacherData({ ...teacherData, email: e.target.value.replace(/\s/g, '') })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                  maxLength={100}
+                  maxLength={LIMITES_CAMPOS.emailDocente}
+                  placeholder="exemplo@dominio.com"
                   required
                 />
               </div>
@@ -359,7 +433,7 @@ export default function TeacherProfileEdit() {
                   onChange={handlePhoneChange}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={15}
-                  placeholder="(00) 00000-0000"
+                  placeholder="(XX) XXXXX-XXXX"
                   required
                 />
               </div>
@@ -369,9 +443,9 @@ export default function TeacherProfileEdit() {
               <Button
                 className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-md transition-colors"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? (
+                {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="animate-spin">↻</span>
                     Salvando...

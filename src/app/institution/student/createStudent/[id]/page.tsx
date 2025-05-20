@@ -1,6 +1,5 @@
 "use client";
 
-// Importações de componentes e bibliotecas
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
@@ -16,13 +15,17 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 
-// Interface para definir a estrutura de uma turma
 interface Turma {
   id: number;
   nomeTurma: string;
 }
 
-// Componente principal de perfil para criação de aluno
+const LIMITES_CAMPOS = {
+  nomeAluno: 50,
+  telefoneAluno: 11, // Máximo 11 dígitos (com DDD)
+  emailAluno: 100
+};
+
 export default function Profile({
   value,
   className,
@@ -30,107 +33,138 @@ export default function Profile({
   value: number;
   className?: string;
 }) {
-  // Obtém parâmetros da URL
   const params = useParams();
   const id = params.id as string;
 
-  // Estados para os campos do formulário
   const [nomeAluno, setName] = useState("");
   const [emailAluno, setEmail] = useState("");
   const [dataNascimentoAluno, setBirthDate] = useState("");
   const [telefoneAluno, setPhone] = useState("");
   const [turma, setTurma] = useState("");
-  
-  // Estados para tema e imagem
   const { darkMode, toggleTheme } = useTheme();
   const [imageUrl, setImagemPerfil] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Função para atualizar a data de nascimento (sem validação em tempo real)
+  const validateEmail = (email: string): boolean => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+   
+    if (email.length < 5) return false;
+    if (email.includes(' ')) return false;
+    if (email.length > LIMITES_CAMPOS.emailAluno) return false;
+   
+    const parts = email.split('@');
+    if (parts.length !== 2) return false;
+    if (parts[1].indexOf('.') === -1) return false;
+   
+    return regex.test(email);
+  };
+
   const handleDateChange = (value: string) => {
     setBirthDate(value);
   };
 
-  // Manipulador de mudança de imagem
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Evento detectado!");
-
-    if (!event.target.files || event.target.files.length === 0) {
-      console.log("Nenhum arquivo selecionado.");
-      return;
-    }
+    if (!event.target.files || event.target.files.length === 0) return;
 
     const file = event.target.files[0];
-    console.log("Arquivo selecionado:", file);
-
-    // Lê o arquivo e converte para URL de dados
     const reader = new FileReader();
     reader.onloadend = () => {
       if (typeof reader.result === "string") {
-        console.log("Imagem carregada:", reader.result);
         setImagemPerfil(reader.result);
       }
     };
     reader.readAsDataURL(file);
   };
 
-  // Função para submeter o formulário
+  const validatePhone = (phone: string) => {
+    const cleanedPhone = phone.replace(/\D/g, '');
+    return cleanedPhone.length >= 10 && cleanedPhone.length <= 11;
+  };
+
+  const validateName = (name: string) => {
+    return name.trim().length >= 3 && /^[a-zA-ZÀ-ÿ\s']+$/.test(name);
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const cleanedValue = value.replace(/\D/g, '');
+    let formattedValue = '';
+   
+    if (cleanedValue.length > 0) {
+      formattedValue = `(${cleanedValue.substring(0, 2)}`;
+      if (cleanedValue.length > 2) {
+        formattedValue += `) ${cleanedValue.substring(2, 7)}`;
+        if (cleanedValue.length > 7) {
+          formattedValue += `-${cleanedValue.substring(7, 11)}`;
+        }
+      }
+    }
+   
+    setPhone(formattedValue);
+  };
+
+  const handleEmailChange = (value: string) => {
+    const cleanedValue = value.replace(/\s/g, '');
+    setEmail(cleanedValue);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Funções de validação
-    const validateEmail = (email: string) => {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
-    };
-
-    const validatePhone = (phone: string) => {
-      const regex = /^\d{10,11}$/;
-      return regex.test(phone);
-    };
-
-    // Validação de campos obrigatórios
-    if (!nomeAluno || !emailAluno || !dataNascimentoAluno || !telefoneAluno) {
+   
+    if (!nomeAluno.trim() || !emailAluno || !dataNascimentoAluno || !telefoneAluno) {
       toast.warn("Preencha todos os campos obrigatórios.");
       setIsSubmitting(false);
       return;
     }
 
-    // VALIDAÇÃO DA DATA DE NASCIMENTO (APENAS NO SUBMIT)
-    if (dataNascimentoAluno) {
-      const birthDate = new Date(dataNascimentoAluno);
-      const minDate = new Date("1900-01-01");
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (birthDate < minDate) {
-        toast.warn("A data de nascimento não pode ser anterior a 1900");
-        setIsSubmitting(false);
-        return;
-      }
-      if (birthDate > today) {
-        toast.warn("A data de nascimento não pode ser posterior ao dia atual");
-        setIsSubmitting(false);
-        return;
-      }
+    if (!validateName(nomeAluno)) {
+      toast.warn("Nome deve conter apenas letras e ter pelo menos 3 caracteres");
+      setIsSubmitting(false);
+      return;
     }
 
-    // Validações de email e telefone
+    if (nomeAluno.length > LIMITES_CAMPOS.nomeAluno) {
+      toast.warn(`Nome deve ter no máximo ${LIMITES_CAMPOS.nomeAluno} caracteres`);
+      setIsSubmitting(false);
+      return;
+    }
+
     if (!validateEmail(emailAluno)) {
-      toast.warn("Por favor, insira um email válido.");
+      if (emailAluno.includes(' ')) {
+        toast.warn("Email não pode conter espaços");
+      } else if (emailAluno.length > LIMITES_CAMPOS.emailAluno) {
+        toast.warn(`Email deve ter no máximo ${LIMITES_CAMPOS.emailAluno} caracteres`);
+      } else {
+        toast.warn("Por favor, insira um email válido");
+      }
+      setIsSubmitting(false);
+      return;
+    }
+
+    const birthDate = new Date(dataNascimentoAluno);
+    const minDate = new Date("1900-01-01");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (birthDate < minDate) {
+      toast.warn("Data de nascimento não pode ser anterior a 1900");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (birthDate > today) {
+      toast.warn("Data de nascimento não pode ser futura");
       setIsSubmitting(false);
       return;
     }
 
     if (!validatePhone(telefoneAluno)) {
-      toast.warn("Por favor, insira um telefone válido.");
+      toast.warn("Telefone deve ter 10 ou 11 dígitos (com DDD)");
       setIsSubmitting(false);
       return;
     }
 
-    // Verifica se o usuário está autenticado
     const token = localStorage.getItem("token");
     if (!token) {
       toast.warn("Usuário não autenticado. Faça login novamente.");
@@ -140,7 +174,8 @@ export default function Profile({
 
     try {
       setIsModalOpen(true);
-      // Requisição para criar o aluno
+      const cleanedPhone = telefoneAluno.replace(/\D/g, '');
+
       const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student", {
         method: "POST",
         headers: {
@@ -148,18 +183,22 @@ export default function Profile({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          nomeAluno,
+          nomeAluno: nomeAluno.trim(),
           emailAluno,
           dataNascimentoAluno,
-          telefoneAluno,
+          telefoneAluno: cleanedPhone,
           turmaId: id,
           imageUrl,
         }),
       });
 
-      if (!response.ok) throw new Error("Erro ao criar o perfil.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao criar o perfil");
+      } else if(response.status === 400){
+        toast.warn("Email já cadastrado! Por favor, utilize um email diferente.");
+      }
 
-      // Feedback de sucesso e limpeza dos campos
       toast.success("Perfil criado com sucesso!");
       setName("");
       setEmail("");
@@ -167,53 +206,36 @@ export default function Profile({
       setPhone("");
       setImagemPerfil("");
     } catch (error) {
-      console.error("❌ Erro ao criar perfil:", error);
-      toast.error("Erro ao criar perfil.");
+      console.error("Erro ao criar perfil:", error);
+      if (error.message.includes("email")) {
+        toast.error("Este email já está cadastrado");
+      } else {
+        toast.error(error.message || "Erro ao criar perfil");
+      }
     } finally {
       setIsSubmitting(false);
       setIsModalOpen(false);
     }
   };
 
-  // Função para obter a data atual formatada
-  const getCurrentDate = () => {
-    const today = new Date();
-    return today.toLocaleDateString("pt-BR", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  // Efeito para aplicar o tema ao carregar a página
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
-  // Efeito para buscar informações da turma
   useEffect(() => {
     fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class/teacher/disciplinas/${id}`)
       .then((response) => response.json())
       .then((data) => setTurma(data))
       .catch((error) => console.error("Erro ao buscar turma:", error));
-  }, []);
+  }, [id]);
 
-  // Renderização do componente
   return (
     <>
-      {/* Container para notificações toast */}
       <ToastContainer />
-      
-      {/* Layout principal */}
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
-        {/* Barra lateral */}
         <Sidebar />
-        
-        {/* Conteúdo principal */}
         <main className="flex-1 p-8">
-          {/* Cabeçalho */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className={`text-2xl font-bold ${darkMode ? "text-blue-500" : "text-blue-500"}`}>
@@ -223,15 +245,12 @@ export default function Profile({
                 Preencha os campos abaixo para criar uma novo aluno.
               </p>
             </div>
-            {/* Botão para alternar entre tema claro/escuro */}
             <Button onClick={toggleTheme}>
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
           </div>
 
-          {/* Formulário de criação de aluno */}
           <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-3xl">
-            {/* Upload de imagem */}
             <div className="flex flex-col items-center gap-4">
               <Image
                 src={imageUrl || User}
@@ -240,51 +259,64 @@ export default function Profile({
                 className="rounded-full w-16 h-16 sm:w-20 sm:h-20"
                 alt="Foto de perfil"
               />
-
               <InputImage onChange={handleImageChange} />
             </div>
 
-            {/* Campos do formulário */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                {
-                  label: "Nome Completo",
-                  state: nomeAluno,
-                  setState: setName,
-                },
-                {
-                  label: "Data de Nascimento",
-                  state: dataNascimentoAluno,
-                  setState: handleDateChange,
-                },
-                {
-                  label: "Email",
-                  state: emailAluno,
-                  setState: setEmail,
-                },
-                {
-                  label: "Telefone",
-                  state: telefoneAluno,
-                  setState: setPhone,
-                  maxLength: 11,
-                },
-              ].map(({ label, state, setState, maxLength }) => (
-                <div key={label} className="space-y-2">
-                  <label className="text-sm text-muted-foreground dark:text-gray-500">
-                    {label}
-                  </label>
-                  <Input
-                    type={label === "Data de Nascimento" ? "date" : "text"}
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    className="bg-blue-50 dark:bg-[#141414] dark:text-white dark:border-[#141414]"
-                    maxLength={maxLength}
-                  />
-                </div>
-              ))}
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-500">
+                  Nome Completo
+                </label>
+                <Input
+                  type="text"
+                  value={nomeAluno}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-blue-50 dark:bg-[#141414] dark:text-white dark:border-[#141414]"
+                  maxLength={LIMITES_CAMPOS.nomeAluno}
+                />
+              </div>
+             
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-500">
+                  Data de Nascimento
+                </label>
+                <Input
+                  type="date"
+                  value={dataNascimentoAluno}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  className="bg-blue-50 dark:bg-[#141414] dark:text-white dark:border-[#141414]"
+                />
+              </div>
+             
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-500">
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  value={emailAluno}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  className="bg-blue-50 dark:bg-[#141414] dark:text-white dark:border-[#141414]"
+                  placeholder="exemplo@dominio.com"
+                  maxLength={LIMITES_CAMPOS.emailAluno}
+                />
+              </div>
+             
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-500">
+                  Telefone
+                </label>
+                <Input
+                  type="text"
+                  value={telefoneAluno}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  className="bg-blue-50 dark:bg-[#141414] dark:text-white dark:border-[#141414]"
+                  maxLength={15}
+                  placeholder="(XX) XXXXX-XXXX"
+                />
+              </div>
             </div>
 
-            {/* Botão de submissão */}
             <div className="flex justify-center">
               <Button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-8"
@@ -295,8 +327,7 @@ export default function Profile({
               </Button>
             </div>
           </div>
-          
-          {/* Modal de carregamento */}
+         
           <ModalCreate
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}

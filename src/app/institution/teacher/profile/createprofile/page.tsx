@@ -1,6 +1,4 @@
-"use client"; // Indica que este é um componente do lado do cliente (Next.js)
-
-// Importações de componentes e bibliotecas
+"use client";
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
@@ -17,33 +15,88 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import User from "@/assets/images/adicionar-usuario 1.png";
 
-// Interface para definir a estrutura de uma disciplina
+// Constants and interfaces
 interface Disciplina {
   id: number;
   nomeDisciplina: string;
 }
 
-// Componente principal da página de perfil/criação de docente
+const LIMITES_CAMPOS = {
+  nomeDocente: 50,
+  telefoneDocente: 15, // Formatted phone: (XX) XXXXX-XXXX
+  emailDocente: 100,
+  maxImageSize: 2 * 1024 * 1024, // 2MB
+  minAge: 18, // Minimum age required
+};
+
+// Validation functions
+const validateEmail = (email: string): boolean => {
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  
+  if (email.length < 5) return false;
+  if (email.includes(' ')) return false;
+  if (email.length > LIMITES_CAMPOS.emailDocente) return false;
+  
+  const parts = email.split('@');
+  if (parts.length !== 2) return false;
+  if (parts[1].indexOf('.') === -1) return false;
+  
+  return regex.test(email);
+};
+
+const validatePhone = (phone: string): boolean => {
+  const cleanedPhone = phone.replace(/\D/g, '');
+  return cleanedPhone.length >= 10 && cleanedPhone.length <= 11;
+};
+
+const validateName = (name: string): boolean => {
+  return name.trim().length >= 3 && 
+         /^[a-zA-ZÀ-ÿ\s']+$/.test(name) &&
+         name.length <= LIMITES_CAMPOS.nomeDocente;
+};
+
+const validateBirthDate = (dateString: string): { valid: boolean; message?: string } => {
+  if (!dateString) return { valid: false, message: "Data de nascimento é obrigatória" };
+
+  const birthDate = new Date(dateString);
+  const minDate = new Date("1900-01-01");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (birthDate < minDate) {
+    return { valid: false, message: "Data de nascimento não pode ser anterior a 1900" };
+  }
+  if (birthDate > today) {
+    return { valid: false, message: "Data de nascimento não pode ser futura" };
+  }
+
+  // Validate minimum age (18 years)
+  const minAgeDate = new Date();
+  minAgeDate.setFullYear(minAgeDate.getFullYear() - LIMITES_CAMPOS.minAge);
+  if (birthDate > minAgeDate) {
+    return { valid: false, message: `O docente deve ter pelo menos ${LIMITES_CAMPOS.minAge} anos` };
+  }
+
+  return { valid: true };
+};
+
 export default function Profile() {
-  // Obtém parâmetros da URL
   const params = useParams();
   const id = params.id as string;
   
-  // Estados para gerenciar:
-  const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]); // Lista de disciplinas
-  const [loading, setLoading] = useState(false); // Estado de carregamento
-  const [error, setError] = useState<string | null>(null); // Mensagens de erro
-  const [nomeDocente, setName] = useState(""); // Nome do docente
-  const [emailDocente, setEmail] = useState(""); // Email do docente
-  const [dataNascimentoDocente, setBirthDate] = useState(""); // Data de nascimento
-  const [telefoneDocente, setPhone] = useState(""); // Telefone do docente
-  const [imageUrl, setImagemPerfil] = useState<string | null>(null); // URL da imagem de perfil
-  const [disciplineId, setDisciplineId] = useState<number[]>([]); // IDs das disciplinas selecionadas
-  const { darkMode, toggleTheme } = useTheme(); // Gerenciamento de tema claro/escuro
-  const [isModalOpen, setIsModalOpen] = useState(false); // Controle do modal
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado durante envio do formulário
+  const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [nomeDocente, setName] = useState("");
+  const [emailDocente, setEmail] = useState("");
+  const [dataNascimentoDocente, setBirthDate] = useState("");
+  const [telefoneDocente, setPhone] = useState("");
+  const [imageUrl, setImagemPerfil] = useState<string | null>(null);
+  const [disciplineId, setDisciplineId] = useState<number[]>([]);
+  const { darkMode, toggleTheme } = useTheme();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Função para obter a data atual no formato YYYY-MM-DD
   const getTodayDateString = (): string => {
     const today = new Date();
     const year = today.getFullYear();
@@ -52,7 +105,6 @@ export default function Profile() {
     return `${year}-${month}-${day}`;
   };
 
-  // Função para formatar a data para exibição amigável
   const formatCurrentDate = (): string => {
     const today = new Date();
     return today.toLocaleDateString("pt-BR", {
@@ -63,7 +115,52 @@ export default function Profile() {
     });
   };
 
-  // Efeito para carregar as disciplinas ao montar o componente
+  const handlePhoneChange = (value: string) => {
+    const cleanedValue = value.replace(/\D/g, '');
+    let formattedValue = '';
+    
+    if (cleanedValue.length > 0) {
+      formattedValue = `(${cleanedValue.substring(0, 2)}`;
+      if (cleanedValue.length > 2) {
+        formattedValue += `) ${cleanedValue.substring(2, 7)}`;
+        if (cleanedValue.length > 7) {
+          formattedValue += `-${cleanedValue.substring(7, 11)}`;
+        }
+      }
+    }
+    
+    setPhone(formattedValue);
+  };
+
+  const handleEmailChange = (value: string) => {
+    const cleanedValue = value.replace(/\s/g, '');
+    setEmail(cleanedValue);
+  };
+
+  const handleDisciplineSelection = (id: number) => {
+    setDisciplineId((prev) =>
+      prev.includes(id) ? prev.filter((did) => did !== id) : [...prev, id]
+    );
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) return;
+
+    const file = event.target.files[0];
+    if (file.size > LIMITES_CAMPOS.maxImageSize) {
+      toast.warn(`A imagem deve ter no máximo ${LIMITES_CAMPOS.maxImageSize / (1024 * 1024)}MB`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setImagemPerfil(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   useEffect(() => {
     setLoading(true);
     fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline")
@@ -79,85 +176,72 @@ export default function Profile() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Função para validar formato de email
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
-  // Função para validar formato de telefone (10 ou 11 dígitos)
-  const validatePhone = (phone: string) => {
-    const regex = /^\d{10,11}$/;
-    return regex.test(phone);
-  };
-
-  // Manipula seleção/deseleção de disciplinas
-  const handleDisciplineSelection = (id: number) => {
-    setDisciplineId((prev) =>
-      prev.includes(id) ? prev.filter((did) => did !== id) : [...prev, id]
-    );
-  };
-
-  // Manipula upload de imagem de perfil
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) return;
-
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        setImagemPerfil(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Manipula o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validação de campos obrigatórios
-    if (!nomeDocente || !emailDocente || !dataNascimentoDocente || !telefoneDocente) {
+    // Validate required fields
+    if (!nomeDocente.trim() || !emailDocente || !dataNascimentoDocente || !telefoneDocente) {
       toast.warn("Preencha todos os campos obrigatórios.");
       setIsSubmitting(false);
       return;
     }
 
-    // Validação da data de nascimento
-    if (dataNascimentoDocente) {
-      const birthDate = new Date(dataNascimentoDocente);
-      const minDate = new Date("1900-01-01");
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (birthDate < minDate) {
-        toast.warn("A data de nascimento não pode ser anterior a 1900");
-        setIsSubmitting(false);
-        return;
+    // Validate name
+    if (!validateName(nomeDocente)) {
+      if (nomeDocente.trim().length < 3) {
+        toast.warn("Nome deve ter pelo menos 3 caracteres");
+      } else if (!/^[a-zA-ZÀ-ÿ\s']+$/.test(nomeDocente)) {
+        toast.warn("Nome deve conter apenas letras e espaços");
+      } else {
+        toast.warn(`Nome deve ter no máximo ${LIMITES_CAMPOS.nomeDocente} caracteres`);
       }
-      if (birthDate > today) {
-        toast.warn("A data de nascimento não pode ser posterior ao dia atual");
-        setIsSubmitting(false);
-        return;
-      }
+      setIsSubmitting(false);
+      return;
     }
 
-    // Validação de email
+    // Validate email
     if (!validateEmail(emailDocente)) {
-      toast.warn("Por favor, insira um email válido.");
+      if (emailDocente.includes(' ')) {
+        toast.warn("Email não pode conter espaços");
+      } else if (emailDocente.length > LIMITES_CAMPOS.emailDocente) {
+        toast.warn(`Email deve ter no máximo ${LIMITES_CAMPOS.emailDocente} caracteres`);
+      } else {
+        toast.warn("Por favor, insira um email válido");
+      }
       setIsSubmitting(false);
       return;
     }
 
-    // Validação de telefone
+    // Validate birth date
+    const birthDateValidation = validateBirthDate(dataNascimentoDocente);
+    if (!birthDateValidation.valid) {
+      toast.warn(birthDateValidation.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate phone
     if (!validatePhone(telefoneDocente)) {
-      toast.warn("Por favor, insira um telefone válido.");
+      toast.warn("Telefone deve ter 10 ou 11 dígitos (com DDD)");
       setIsSubmitting(false);
       return;
     }
 
-    // Verifica se o usuário está autenticado
+    // Validate at least one discipline selected
+    if (disciplineId.length === 0) {
+      toast.warn("Selecione pelo menos uma disciplina");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate image size (if provided)
+    if (imageUrl && imageUrl.length > 5 * 1024 * 1024) { // Rough base64 size check
+      toast.warn("A imagem é muito grande. Por favor, selecione uma imagem menor.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       toast.warn("Usuário não autenticado. Faça login novamente.");
@@ -166,9 +250,10 @@ export default function Profile() {
     }
 
     try {
-      setIsModalOpen(true); // Abre o modal de carregamento
+      setIsModalOpen(true);
       
-      // Envia os dados para a API
+      const cleanedPhone = telefoneDocente.replace(/\D/g, '');
+      
       const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher", {
         method: "POST",
         headers: {
@@ -176,19 +261,22 @@ export default function Profile() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          nomeDocente,
+          nomeDocente: nomeDocente.trim(),
           emailDocente,
           dataNascimentoDocente,
-          telefoneDocente,
+          telefoneDocente: cleanedPhone,
           imageUrl,
           disciplineId,
         }),
       });
 
-      if (!response.ok) throw new Error("Erro ao criar o perfil.");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao criar o perfil");
+      }
 
       toast.success("Perfil criado com sucesso!");
-      // Reseta o formulário após sucesso
+      // Reset form
       setName("");
       setEmail("");
       setBirthDate("");
@@ -197,14 +285,17 @@ export default function Profile() {
       setDisciplineId([]);
     } catch (error) {
       console.error("❌ Erro ao criar perfil:", error);
-      toast.error("Erro ao criar perfil.");
+      if (error.message.includes("email")) {
+        toast.error("Este email já está cadastrado");
+      } else {
+        toast.error(error.message || "Erro ao criar perfil");
+      }
     } finally {
       setIsSubmitting(false);
       setIsModalOpen(false);
     }
   };
 
-  // Efeito para aplicar o tema ao HTML e salvar no localStorage
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     localStorage.setItem("theme", darkMode ? "dark" : "light");
@@ -212,18 +303,11 @@ export default function Profile() {
 
   return (
     <>
-      {/* Container para notificações toast */}
       <ToastContainer />
-      
-      {/* Layout principal */}
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
-        {/* Sidebar */}
         <Sidebar />
-        
-        {/* Conteúdo principal */}
         <main className="flex-1">
           <div className="p-8">
-            {/* Cabeçalho com título e data */}
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-2xl font-bold text-blue-500">
@@ -231,18 +315,15 @@ export default function Profile() {
                 </h1>
                 <p className="text-gray-500">{formatCurrentDate()}</p>
               </div>
-              {/* Botão para alternar tema */}
               <Button onClick={toggleTheme}>
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </Button>
             </div>
 
-            {/* Formulário de criação de docente */}
             <div className="container mx-auto p-6 space-y-6 max-w-5xl h-1/2 bg-[#ffffff] dark:bg-black rounded-3xl">
-              {/* Upload de imagem de perfil */}
               <div className="flex flex-col items-center gap-4">
                 <Image
-                  src={imageUrl || User} // Usa imagem personalizada ou padrão
+                  src={imageUrl || User}
                   width={80}
                   height={80}
                   className="rounded-full w-16 h-16 sm:w-20 sm:h-20"
@@ -251,62 +332,63 @@ export default function Profile() {
                 <InputImage onChange={handleImageChange} />
               </div>
 
-              {/* Campos do formulário */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[
-                  // Configuração dinâmica dos campos
-                  {
-                    label: "Nome Completo",
-                    state: nomeDocente,
-                    setState: setName,
-                    maxLength: 100,
-                    type: "text",
-                  },
-                  {
-                    label: "Data de Nascimento",
-                    state: dataNascimentoDocente,
-                    setState: setBirthDate,
-                    type: "date",
-                    min: "1900-01-01",
-                    max: getTodayDateString(),
-                  },
-                  {
-                    label: "Email",
-                    state: emailDocente,
-                    setState: setEmail,
-                    maxLength: 100,
-                    type: "email",
-                  },
-                  {
-                    label: "Telefone",
-                    state: telefoneDocente,
-                    setState: setPhone,
-                    maxLength: 11,
-                    type: "tel",
-                  },
-                ].map(({ label, state, setState, maxLength, type = "text", min, max }) => (
-                  <div key={label} className="space-y-2">
-                    <label className="text-sm text-muted-foreground dark:text-gray-400">
-                      {label}
-                    </label>
-                    <Input
-                      type={type}
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                      maxLength={maxLength}
-                      min={min}
-                      max={max}
-                    />
-                  </div>
-                ))}
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground dark:text-gray-400">
+                    Nome Completo *
+                  </label>
+                  <Input
+                    type="text"
+                    value={nomeDocente}
+                    onChange={(e) => setName(e.target.value)}
+                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                    maxLength={LIMITES_CAMPOS.nomeDocente}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground dark:text-gray-400">
+                    Data de Nascimento *
+                  </label>
+                  <Input
+                    type="date"
+                    value={dataNascimentoDocente}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                    min="1900-01-01"
+                    max={getTodayDateString()}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground dark:text-gray-400">
+                    Email *
+                  </label>
+                  <Input
+                    type="email"
+                    value={emailDocente}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                    maxLength={LIMITES_CAMPOS.emailDocente}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-muted-foreground dark:text-gray-400">
+                    Telefone *
+                  </label>
+                  <Input
+                    type="tel"
+                    value={telefoneDocente}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                    maxLength={15}
+                    placeholder="(XX) XXXXX-XXXX"
+                  />
+                </div>
               </div>
 
-              {/* Seleção de disciplinas */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="text-sm text-muted-foreground mb-4 dark:text-gray-400">
-                    Seleção de disciplinas
+                    Seleção de disciplinas *
                   </h3>
                   {loading ? (
                     <p>Carregando disciplinas...</p>
@@ -336,7 +418,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Botão de submissão */}
               <div className="flex justify-center">
                 <Button
                   className="bg-blue-500 hover:bg-blue-600 text-white px-8"
@@ -349,7 +430,6 @@ export default function Profile() {
             </div>
           </div>
           
-          {/* Modal de carregamento */}
           <ModalCreate
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
