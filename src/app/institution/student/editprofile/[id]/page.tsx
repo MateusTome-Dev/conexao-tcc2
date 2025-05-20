@@ -2,7 +2,7 @@
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/institution/input";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -46,7 +46,7 @@ export default function Profile() {
   // Função aprimorada para formatar a data do backend para o input date
   const formatDateForInput = (backendDate: string): string => {
     if (!backendDate) return "";
-    
+
     // Se já estiver no formato correto (YYYY-MM-DD)
     if (/^\d{4}-\d{2}-\d{2}$/.test(backendDate)) {
       return backendDate;
@@ -54,7 +54,7 @@ export default function Profile() {
 
     // Remove qualquer parte de tempo e timezone se existir
     const datePart = backendDate.split('T')[0].split(' ')[0];
-    
+
     // Cria a data ajustando para o fuso horário local
     const date = new Date(datePart);
     if (isNaN(date.getTime())) return "";
@@ -62,7 +62,7 @@ export default function Profile() {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate() + 1).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
   };
 
@@ -92,12 +92,12 @@ export default function Profile() {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedPhone = formatPhone(e.target.value);
-    setStudentData({...studentData, phone: formattedPhone});
+    setStudentData({ ...studentData, phone: formattedPhone });
   };
 
   const validateDate = (dateString: string): boolean => {
     if (!dateString) return false;
-    
+
     const selectedDate = new Date(dateString);
     const minDate = new Date("1900-01-01");
     const today = new Date();
@@ -124,9 +124,9 @@ export default function Profile() {
           `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${id}`
         );
         if (!response.ok) throw new Error("Falha ao buscar dados do aluno");
-        
+
         const data = await response.json();
-        
+
         console.log("Dados brutos do backend:", data);
         console.log("Data de nascimento recebida:", data.dataNascimentoAluno);
         console.log("Data formatada:", formatDateForInput(data.dataNascimentoAluno));
@@ -163,9 +163,9 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!studentData.name || !studentData.email || 
-        !studentData.birthDate || !studentData.phone) {
+
+    if (!studentData.name || !studentData.email ||
+      !studentData.birthDate || !studentData.phone) {
       toast.warn("Preencha todos os campos obrigatórios!");
       return;
     }
@@ -215,7 +215,7 @@ export default function Profile() {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setStudentData({...studentData, imageUrl: event.target.result as string});
+          setStudentData({ ...studentData, imageUrl: event.target.result as string });
         }
       };
       reader.readAsDataURL(file);
@@ -232,27 +232,42 @@ export default function Profile() {
       <ToastContainer />
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
         <Sidebar />
-        
-        <main className="flex-1 p-8">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400">
-                Editar Aluno
-              </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Preencha os campos abaixo para editar o aluno.
-              </p>
-            </div>
-            <Button 
-              onClick={toggleTheme}
-              variant="ghost"
-              size="icon"
-              aria-label="Alternar tema"
-            >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </Button>
-          </div>
 
+        <main className="flex-1 p-8">
+          <div className="flex items-center justify-between mb-8 relative">
+            {/* Botão Voltar - alinhado à esquerda */}
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors text-blue-500 dark:text-blue-400 z-10"
+            >
+              <ArrowLeft size={20} />
+              <span className="hidden sm:inline">Voltar</span>
+            </button>
+
+            {/* Título Centralizado Absolutamente */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400">
+                  Editar Aluno
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Preencha os campos abaixo para editar o aluno.
+                </p>
+              </div>
+            </div>
+
+            {/* Botão Tema - alinhado à direita */}
+            <div className="z-10">
+              <Button
+                onClick={toggleTheme}
+                variant="ghost"
+                size="icon"
+                aria-label="Alternar tema"
+              >
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </Button>
+            </div>
+          </div>
           <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-lg shadow">
             <div className="flex items-center gap-4">
               {studentData.imageUrl ? (
@@ -297,7 +312,7 @@ export default function Profile() {
                 <Input
                   type="text"
                   value={studentData.name}
-                  onChange={(e) => setStudentData({...studentData, name: e.target.value})}
+                  onChange={(e) => setStudentData({ ...studentData, name: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={100}
                   required
@@ -311,7 +326,7 @@ export default function Profile() {
                 <Input
                   type="date"
                   value={studentData.birthDate || ""}
-                  onChange={(e) => setStudentData({...studentData, birthDate: e.target.value})}
+                  onChange={(e) => setStudentData({ ...studentData, birthDate: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   min="1900-01-01"
                   max={new Date().toISOString().split('T')[0]}
@@ -326,7 +341,7 @@ export default function Profile() {
                 <Input
                   type="email"
                   value={studentData.email}
-                  onChange={(e) => setStudentData({...studentData, email: e.target.value})}
+                  onChange={(e) => setStudentData({ ...studentData, email: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                   maxLength={100}
                   required
@@ -355,7 +370,7 @@ export default function Profile() {
                 <Input
                   type="text"
                   value={studentData.identifierCode}
-                  onChange={(e) => setStudentData({...studentData, identifierCode: e.target.value})}
+                  onChange={(e) => setStudentData({ ...studentData, identifierCode: e.target.value })}
                   className="bg-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
                 />
               </div>
@@ -378,11 +393,11 @@ export default function Profile() {
           </div>
         </main>
       </div>
-      
-      <ModalCreate 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        message="Atualizando dados do aluno..." 
+
+      <ModalCreate
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message="Atualizando dados do aluno..."
       />
     </>
   );

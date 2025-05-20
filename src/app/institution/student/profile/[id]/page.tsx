@@ -5,13 +5,14 @@ import { ProfileInfo } from "@/components/ui/alunos/profile";
 import { Button } from "@/components/ui/alunos/button";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Moon, Pencil, Sun, Trash } from "lucide-react";
+import { Moon, Pencil, Sun, Trash, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import DeleteModal from "@/components/modals/modelDelete";
 import { useTheme } from "@/components/ThemeProvider";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { ButtonEdit } from "@/components/ui/institution/buttonEdit";
 
 // Interface para definir a estrutura dos dados do estudante
 interface StudentProfile {
@@ -116,12 +117,29 @@ export default function User({
         <main className="flex-1">
           <div className="p-8">
             {/* Botão para alternar entre temas claro/escuro */}
-            <div className="flex items-center justify-end mb-8 w-full">
-              <Button onClick={toggleTheme}>
-                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </Button>
+            <div className="grid grid-cols-3 items-center mb-6 w-full">
+              {/* Botão Voltar (esquerda) */}
+              <div className="col-start-1">
+                <button
+                  onClick={() => router.back()}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-blue-500 font-semibold transition-colors"
+                >
+                  <ArrowLeft size={20} />
+                  Voltar
+                </button>
+              </div>
+
+              {/* Espaço vazio do meio */}
+              <div className="col-start-2"></div>
+
+              {/* Botão Tema (direita) */}
+              <div className="col-start-3 flex justify-end">
+                <Button onClick={toggleTheme}>
+                  {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </Button>
+              </div>
             </div>
-            
+
             {/* Container principal com informações do estudante */}
             <div className="bg-white dark:bg-black rounded-lg shadow-sm p-3">
               {/* Exibe as informações do estudante se os dados estiverem disponíveis */}
@@ -135,7 +153,7 @@ export default function User({
                   registrationNumber={studentData.matriculaAluno}
                 />
               )}
-              
+
               {/* Botões de ação (editar e excluir) */}
               <div className="w-full flex flex-row justify-end space-x-4 pr-8">
                 <Link href={`../editprofile/${id}`}>
@@ -150,20 +168,19 @@ export default function User({
                   <Trash size={20} />
                 </button>
               </div>
-              
+
               {/* Link para ver mais informações (feedback) */}
               <div className="flex justify-center w-full">
-                <Link
-                  className="text-[#4184ff] hover:underline"
-                  href={`./feedback/${id}`}
+                <ButtonEdit
+                  onClick={() => window.location.href = `./feedback/${id}`}
                 >
                   Ver Mais
-                </Link>
+                </ButtonEdit>
               </div>
             </div>
           </div>
         </main>
-        
+
         {/* Modal de confirmação para exclusão */}
         <DeleteModal
           isOpen={isModalOpen}
