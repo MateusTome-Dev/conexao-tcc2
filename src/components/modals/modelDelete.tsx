@@ -12,7 +12,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }: DeleteModalProps) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-96 relative">
+      <div className="bg-white dark:bg-[#141414] p-6 rounded-lg shadow-lg w-96 relative">
         <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>
           ✖
         </button>
