@@ -13,11 +13,14 @@ export default function Ocurrence() {
 
   const enviarFeedback = async () => {
     try {
-      if (feedback.length > 100) {
+      if (feedback.length > 100 ) {
         toast.warn("O feedback deve ter no máximo 100 caracteres.");
         return;
       }
-
+      if(!feedback) {
+        toast.warn("O feedback não pode ser vazio.");
+        return;
+      }
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
 

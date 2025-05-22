@@ -47,6 +47,11 @@ export function NoticeCard({ onRefresh }: NoticeCardProps) {
       return;
     }
 
+    if (!aviso) {
+      toast.warn("Preencha o aviso antes de enviar.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");

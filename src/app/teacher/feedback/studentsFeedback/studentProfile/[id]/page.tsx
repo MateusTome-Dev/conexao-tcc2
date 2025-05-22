@@ -45,10 +45,16 @@ export default function User({
   // Função para buscar dados do estudante na API
   const fetchStudentData = async () => {
     try {
+
+
+
+
       const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${id}`);
       console.log(id);
       
       // Verifica se a resposta da API foi bem-sucedida
+
+
       if (!response.ok)
         throw new Error("Não foi possível carregar os dados do estudante");
 
