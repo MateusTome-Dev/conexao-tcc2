@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { jwtDecode } from 'jwt-decode';
 import SmallSelect from "@/components/ui/institution/smallselect";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/alunos/select";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/alunos/selectCreator";
 import { useParams } from 'next/navigation';  
 
 interface FeedbackData {
@@ -37,6 +36,8 @@ const EngagementChart: React.FC = () => {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
   const [chartWidth, setChartWidth] = useState<number>(0);
+  const [viewMode, setViewMode] = useState<'professor' | 'media'>('media');
+  const [selectedOption, setSelectedOption] = useState<string>('media');
 
   useEffect(() => {
     const handleResize = () => {
@@ -71,10 +72,26 @@ const EngagementChart: React.FC = () => {
 
   const types = ["1º Bimestre", "2º Bimestre", "3º Bimestre", "4º Bimestre"];
 
-  const normalizeData = (values: number[]) => {
-    const maxValue = Math.max(...values);
-    if (maxValue === 0) return values;
-    return values.map(value => (value / maxValue) * 5);
+  const calculateAverage = (feedbackList: FeedbackData[]) => {
+    if (feedbackList.length === 0) return [0, 0, 0, 0, 0];
+    
+    const sum = feedbackList.reduce((acc, curr) => {
+      return {
+        resposta1: acc.resposta1 + curr.resposta1,
+        resposta2: acc.resposta2 + curr.resposta2,
+        resposta3: acc.resposta3 + curr.resposta3,
+        resposta4: acc.resposta4 + curr.resposta4,
+        resposta5: acc.resposta5 + curr.resposta5,
+      };
+    }, { resposta1: 0, resposta2: 0, resposta3: 0, resposta4: 0, resposta5: 0 });
+
+    return [
+      sum.resposta1 / feedbackList.length,
+      sum.resposta2 / feedbackList.length,
+      sum.resposta3 / feedbackList.length,
+      sum.resposta4 / feedbackList.length,
+      sum.resposta5 / feedbackList.length,
+    ];
   };
 
   const fetchCreators = async () => {
@@ -93,10 +110,6 @@ const EngagementChart: React.FC = () => {
       const dados = await resposta.json();
       setCreators(dados);
       
-      // Seleciona o primeiro professor por padrão se existir
-      if (dados.length > 0) {
-        setSelectedCreator(dados[0]);
-      }
     } catch (err: any) {
       console.error("Erro ao buscar professores:", err);
       setError(err.message || "Erro ao buscar os professores");
@@ -126,28 +139,41 @@ const EngagementChart: React.FC = () => {
         return;
       }
 
-      // Filtra por professor selecionado
-      const filteredByCreator = selectedCreator
-        ? dados.filter((item: FeedbackData) => item.createdByDTO?.id === selectedCreator.id)
-        : dados;
+      const filteredByBimestre = dados.filter((item: FeedbackData) => item.bimestre === bimestre);
 
-      // Filtra por bimestre selecionado
-      const filteredData = filteredByCreator.filter((item: FeedbackData) => item.bimestre === bimestre);
-
-      if (filteredData.length === 0) {
+      if (filteredByBimestre.length === 0) {
         setData([]);
         return;
       }
 
-      const values = [
-        filteredData[0].resposta1,
-        filteredData[0].resposta2,
-        filteredData[0].resposta3,
-        filteredData[0].resposta4,
-        filteredData[0].resposta5,
-      ];
+      let values: number[] = [];
+      let displayName = "Média Geral";
+      
+      if (viewMode === 'media') {
+        // Calcula a média de todos os professores
+        values = calculateAverage(filteredByBimestre);
+      } else {
+        // Filtra por professor selecionado
+        const filteredByCreator = selectedCreator
+          ? filteredByBimestre.filter((item: FeedbackData) => item.createdByDTO?.id === selectedCreator.id)
+          : filteredByBimestre;
 
-      const normalizedValues = normalizeData(values);
+        if (filteredByCreator.length === 0) {
+          setData([]);
+          return;
+        }
+
+        // Pega o primeiro feedback do professor selecionado
+        const feedback = filteredByCreator[0];
+        values = [
+          feedback.resposta1,
+          feedback.resposta2,
+          feedback.resposta3,
+          feedback.resposta4,
+          feedback.resposta5,
+        ];
+        displayName = selectedCreator?.nomeDocente || "Professor";
+      }
 
       const categories = [
         { tiny: "Eng", short: "Eng", full: "Engajamento" },
@@ -160,7 +186,7 @@ const EngagementChart: React.FC = () => {
       const formattedData = categories.map((category, index) => ({
         name: chartWidth < 350 ? category.tiny : chartWidth < 600 ? category.short : category.full,
         fullName: category.full,
-        value: normalizedValues[index],
+        value: values[index],
       }));
 
       setData(formattedData);
@@ -178,15 +204,23 @@ const EngagementChart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (creators.length > 0 && studentId) {
+    if (studentId) {
       fetchData();
     }
-  }, [bimestre, selectedCreator, studentId, chartWidth]);
+  }, [bimestre, selectedCreator, studentId, chartWidth, viewMode]);
 
-  const handleCreatorChange = (nomeDocente: string) => {
-    const creator = creators.find(c => c.nomeDocente === nomeDocente);
-    if (creator) {
-      setSelectedCreator(creator);
+  const handleCreatorChange = (value: string) => {
+    if (value === 'media') {
+      setViewMode('media');
+      setSelectedCreator(null);
+      setSelectedOption('media');
+    } else {
+      const creator = creators.find(c => c.nomeDocente === value);
+      if (creator) {
+        setSelectedCreator(creator);
+        setViewMode('professor');
+        setSelectedOption(creator.nomeDocente);
+      }
     }
   };
 
@@ -198,6 +232,10 @@ const EngagementChart: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow-md">
         <p className="font-semibold">{dataPoint.fullName}</p>
         <p>Valor: {payload[0].value.toFixed(2)}</p>
+        {viewMode === 'media' && <p className="text-sm text-gray-500">Média de todos os professores</p>}
+        {viewMode === 'professor' && selectedCreator && (
+          <p className="text-sm text-gray-500">Professor: {selectedCreator.nomeDocente}</p>
+        )}
       </div>
     );
   };
@@ -209,13 +247,19 @@ const EngagementChart: React.FC = () => {
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="w-full sm:w-auto">
           <Select
+            value={selectedOption}
             onValueChange={handleCreatorChange}
-            value={selectedCreator?.nomeDocente || ""}
           >
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue placeholder={selectedCreator ? selectedCreator.nomeDocente : "Selecione o Professor"} />
+            <SelectTrigger className="w-full sm:w-[250px]">
+              <SelectValue>
+                {(value) => value === 'media' 
+                  ? "Média de todos os professores" 
+                  : creators.find(c => c.nomeDocente === value)?.nomeDocente || "Selecione um professor"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="media">Média de todos os professores</SelectItem>
+              <SelectItem disabled>Professores individuais</SelectItem>
               {creators.map((creator) => (
                 <SelectItem key={creator.id} value={creator.nomeDocente}>
                   {creator.nomeDocente}
@@ -270,7 +314,11 @@ const EngagementChart: React.FC = () => {
                 content={<CustomTooltip />}
                 cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
               />
-              <Bar dataKey="value" fill="#3182CE" />
+              <Bar 
+                dataKey="value" 
+                fill={viewMode === 'media' ? "#3182CE" : "#3182CE"} 
+                name={viewMode === 'media' ? "Média Geral" : selectedCreator?.nomeDocente || "Professor"}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
