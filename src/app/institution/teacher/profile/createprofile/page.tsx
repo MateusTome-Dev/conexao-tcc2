@@ -2,11 +2,11 @@
 import Sidebar from "@/components/layout/sidebarInstitution";
 import { Button } from "@/components/ui/institution/buttonSubmit";
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/institution/input";
 import { Checkbox } from "@/components/ui/institution/checkbox";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 import ModalCreate from "@/components/modals/modalCreate";
 import InputImage from "@/components/ui/institution/InputImage";
@@ -32,31 +32,36 @@ const LIMITES_CAMPOS = {
 // Validation functions
 const validateEmail = (email: string): boolean => {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  
+
   if (email.length < 5) return false;
-  if (email.includes(' ')) return false;
+  if (email.includes(" ")) return false;
   if (email.length > LIMITES_CAMPOS.emailDocente) return false;
-  
-  const parts = email.split('@');
+
+  const parts = email.split("@");
   if (parts.length !== 2) return false;
-  if (parts[1].indexOf('.') === -1) return false;
-  
+  if (parts[1].indexOf(".") === -1) return false;
+
   return regex.test(email);
 };
 
 const validatePhone = (phone: string): boolean => {
-  const cleanedPhone = phone.replace(/\D/g, '');
+  const cleanedPhone = phone.replace(/\D/g, "");
   return cleanedPhone.length >= 10 && cleanedPhone.length <= 11;
 };
 
 const validateName = (name: string): boolean => {
-  return name.trim().length >= 3 && 
-         /^[a-zA-ZÀ-ÿ\s']+$/.test(name) &&
-         name.length <= LIMITES_CAMPOS.nomeDocente;
+  return (
+    name.trim().length >= 3 &&
+    /^[a-zA-ZÀ-ÿ\s']+$/.test(name) &&
+    name.length <= LIMITES_CAMPOS.nomeDocente
+  );
 };
 
-const validateBirthDate = (dateString: string): { valid: boolean; message?: string } => {
-  if (!dateString) return { valid: false, message: "Data de nascimento é obrigatória" };
+const validateBirthDate = (
+  dateString: string
+): { valid: boolean; message?: string } => {
+  if (!dateString)
+    return { valid: false, message: "Data de nascimento é obrigatória" };
 
   const birthDate = new Date(dateString);
   const minDate = new Date("1900-01-01");
@@ -64,7 +69,10 @@ const validateBirthDate = (dateString: string): { valid: boolean; message?: stri
   today.setHours(0, 0, 0, 0);
 
   if (birthDate < minDate) {
-    return { valid: false, message: "Data de nascimento não pode ser anterior a 1900" };
+    return {
+      valid: false,
+      message: "Data de nascimento não pode ser anterior a 1900",
+    };
   }
   if (birthDate > today) {
     return { valid: false, message: "Data de nascimento não pode ser futura" };
@@ -74,7 +82,10 @@ const validateBirthDate = (dateString: string): { valid: boolean; message?: stri
   const minAgeDate = new Date();
   minAgeDate.setFullYear(minAgeDate.getFullYear() - LIMITES_CAMPOS.minAge);
   if (birthDate > minAgeDate) {
-    return { valid: false, message: `O docente deve ter pelo menos ${LIMITES_CAMPOS.minAge} anos` };
+    return {
+      valid: false,
+      message: `O docente deve ter pelo menos ${LIMITES_CAMPOS.minAge} anos`,
+    };
   }
 
   return { valid: true };
@@ -83,7 +94,9 @@ const validateBirthDate = (dateString: string): { valid: boolean; message?: stri
 export default function Profile() {
   const params = useParams();
   const id = params.id as string;
-  
+  const router = useRouter();
+  const { darkMode, toggleTheme } = useTheme();
+
   const [disciplinas, setDisciplinas] = useState<Disciplina[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,32 +106,21 @@ export default function Profile() {
   const [telefoneDocente, setPhone] = useState("");
   const [imageUrl, setImagemPerfil] = useState<string | null>(null);
   const [disciplineId, setDisciplineId] = useState<number[]>([]);
-  const { darkMode, toggleTheme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getTodayDateString = (): string => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
-  const formatCurrentDate = (): string => {
-    const today = new Date();
-    return today.toLocaleDateString("pt-BR", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
   const handlePhoneChange = (value: string) => {
-    const cleanedValue = value.replace(/\D/g, '');
-    let formattedValue = '';
-    
+    const cleanedValue = value.replace(/\D/g, "");
+    let formattedValue = "";
+
     if (cleanedValue.length > 0) {
       formattedValue = `(${cleanedValue.substring(0, 2)}`;
       if (cleanedValue.length > 2) {
@@ -128,12 +130,12 @@ export default function Profile() {
         }
       }
     }
-    
+
     setPhone(formattedValue);
   };
 
   const handleEmailChange = (value: string) => {
-    const cleanedValue = value.replace(/\s/g, '');
+    const cleanedValue = value.replace(/\s/g, "");
     setEmail(cleanedValue);
   };
 
@@ -148,7 +150,11 @@ export default function Profile() {
 
     const file = event.target.files[0];
     if (file.size > LIMITES_CAMPOS.maxImageSize) {
-      toast.warn(`A imagem deve ter no máximo ${LIMITES_CAMPOS.maxImageSize / (1024 * 1024)}MB`);
+      toast.warn(
+        `A imagem deve ter no máximo ${
+          LIMITES_CAMPOS.maxImageSize / (1024 * 1024)
+        }MB`
+      );
       return;
     }
 
@@ -163,7 +169,9 @@ export default function Profile() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline")
+    fetch(
+      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline"
+    )
       .then((response) => response.json())
       .then((data: Disciplina[]) => {
         setDisciplinas(data);
@@ -181,7 +189,12 @@ export default function Profile() {
     setIsSubmitting(true);
 
     // Validate required fields
-    if (!nomeDocente.trim() || !emailDocente || !dataNascimentoDocente || !telefoneDocente) {
+    if (
+      !nomeDocente.trim() ||
+      !emailDocente ||
+      !dataNascimentoDocente ||
+      !telefoneDocente
+    ) {
       toast.warn("Preencha todos os campos obrigatórios.");
       setIsSubmitting(false);
       return;
@@ -194,7 +207,9 @@ export default function Profile() {
       } else if (!/^[a-zA-ZÀ-ÿ\s']+$/.test(nomeDocente)) {
         toast.warn("Nome deve conter apenas letras e espaços");
       } else {
-        toast.warn(`Nome deve ter no máximo ${LIMITES_CAMPOS.nomeDocente} caracteres`);
+        toast.warn(
+          `Nome deve ter no máximo ${LIMITES_CAMPOS.nomeDocente} caracteres`
+        );
       }
       setIsSubmitting(false);
       return;
@@ -202,10 +217,12 @@ export default function Profile() {
 
     // Validate email
     if (!validateEmail(emailDocente)) {
-      if (emailDocente.includes(' ')) {
+      if (emailDocente.includes(" ")) {
         toast.warn("Email não pode conter espaços");
       } else if (emailDocente.length > LIMITES_CAMPOS.emailDocente) {
-        toast.warn(`Email deve ter no máximo ${LIMITES_CAMPOS.emailDocente} caracteres`);
+        toast.warn(
+          `Email deve ter no máximo ${LIMITES_CAMPOS.emailDocente} caracteres`
+        );
       } else {
         toast.warn("Por favor, insira um email válido");
       }
@@ -236,8 +253,11 @@ export default function Profile() {
     }
 
     // Validate image size (if provided)
-    if (imageUrl && imageUrl.length > 5 * 1024 * 1024) { // Rough base64 size check
-      toast.warn("A imagem é muito grande. Por favor, selecione uma imagem menor.");
+    if (imageUrl && imageUrl.length > 5 * 1024 * 1024) {
+      // Rough base64 size check
+      toast.warn(
+        "A imagem é muito grande. Por favor, selecione uma imagem menor."
+      );
       setIsSubmitting(false);
       return;
     }
@@ -251,24 +271,27 @@ export default function Profile() {
 
     try {
       setIsModalOpen(true);
-      
-      const cleanedPhone = telefoneDocente.replace(/\D/g, '');
-      
-      const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nomeDocente: nomeDocente.trim(),
-          emailDocente,
-          dataNascimentoDocente,
-          telefoneDocente: cleanedPhone,
-          imageUrl,
-          disciplineId,
-        }),
-      });
+
+      const cleanedPhone = telefoneDocente.replace(/\D/g, "");
+
+      const response = await fetch(
+        "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            nomeDocente: nomeDocente.trim(),
+            emailDocente,
+            dataNascimentoDocente,
+            telefoneDocente: cleanedPhone,
+            imageUrl,
+            disciplineId,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -306,130 +329,145 @@ export default function Profile() {
       <ToastContainer />
       <div className="flex min-h-screen bg-[#F0F7FF] dark:bg-[#141414]">
         <Sidebar />
-        <main className="flex-1">
-          <div className="p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-2xl font-bold text-blue-500">
-                  Criar Docente
-                </h1>
-                <p className="text-gray-500">{formatCurrentDate()}</p>
+        <main className="flex-1 p-4">
+          <div className="flex items-center justify-between mb-8">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors text-blue-500 dark:text-blue-400"
+            >
+              <ArrowLeft size={20} />
+              <span className="hidden sm:inline">Voltar</span>
+            </button>
+
+            <div className="flex-1 text-center mx-4 min-w-0">
+              <h1 className="text-2xl font-bold text-blue-500 dark:text-blue-400 truncate">
+                Criar Docente
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                Preencha os campos abaixo para criar docente.
+              </p>
+            </div>
+
+            <Button
+              onClick={toggleTheme}
+              variant="ghost"
+              size="icon"
+              aria-label="Alternar tema"
+              className="hover:bg-blue-50 dark:hover:bg-gray-800"
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </Button>
+          </div>
+           
+          <div className="container mx-auto p-6 space-y-6 max-w-5xl bg-white dark:bg-black rounded-3xl shadow-sm">
+            <div className="flex flex-col items-center gap-4">
+              <Image
+                src={imageUrl || User}
+                width={80}
+                height={80}
+                className="rounded-full w-16 h-16 sm:w-20 sm:h-20 object-cover"
+                alt="Foto de perfil"
+              />
+              <InputImage onChange={handleImageChange} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-400">
+                  Nome Completo *
+                </label>
+                <Input
+                  type="text"
+                  value={nomeDocente}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                  maxLength={LIMITES_CAMPOS.nomeDocente}
+                />
               </div>
-              <Button onClick={toggleTheme}>
-                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-400">
+                  Data de Nascimento *
+                </label>
+                <Input
+                  type="date"
+                  value={dataNascimentoDocente}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                  min="1900-01-01"
+                  max={getTodayDateString()}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-400">
+                  Email *
+                </label>
+                <Input
+                  type="email"
+                  value={emailDocente}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                  maxLength={LIMITES_CAMPOS.emailDocente}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground dark:text-gray-400">
+                  Telefone *
+                </label>
+                <Input
+                  type="tel"
+                  value={telefoneDocente}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
+                  maxLength={15}
+                  placeholder="(XX) XXXXX-XXXX"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-sm text-muted-foreground mb-4 dark:text-gray-400">
+                  Seleção de disciplinas *
+                </h3>
+                {loading ? (
+                  <p>Carregando disciplinas...</p>
+                ) : error ? (
+                  <p className="text-red-500">{error}</p>
+                ) : (
+                  <div className="space-y-3">
+                    {disciplinas.map((disciplina) => (
+                      <div
+                        key={disciplina.id}
+                        className="flex items-center space-x-2 dark:text-white"
+                      >
+                        <Checkbox
+                          id={`disciplina-${disciplina.id}`}
+                          checked={disciplineId.includes(disciplina.id)}
+                          onCheckedChange={() =>
+                            handleDisciplineSelection(disciplina.id)
+                          }
+                        />
+                        <label htmlFor={`disciplina-${disciplina.id}`}>
+                          {disciplina.nomeDisciplina}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-center pt-4">
+              <Button
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded-lg transition-colors"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Criando..." : "Criar professor"}
               </Button>
             </div>
-
-            <div className="container mx-auto p-6 space-y-6 max-w-5xl h-1/2 bg-[#ffffff] dark:bg-black rounded-3xl">
-              <div className="flex flex-col items-center gap-4">
-                <Image
-                  src={imageUrl || User}
-                  width={80}
-                  height={80}
-                  className="rounded-full w-16 h-16 sm:w-20 sm:h-20"
-                  alt="Foto de perfil"
-                />
-                <InputImage onChange={handleImageChange} />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground dark:text-gray-400">
-                    Nome Completo *
-                  </label>
-                  <Input
-                    type="text"
-                    value={nomeDocente}
-                    onChange={(e) => setName(e.target.value)}
-                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                    maxLength={LIMITES_CAMPOS.nomeDocente}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground dark:text-gray-400">
-                    Data de Nascimento *
-                  </label>
-                  <Input
-                    type="date"
-                    value={dataNascimentoDocente}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                    min="1900-01-01"
-                    max={getTodayDateString()}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground dark:text-gray-400">
-                    Email *
-                  </label>
-                  <Input
-                    type="email"
-                    value={emailDocente}
-                    onChange={(e) => handleEmailChange(e.target.value)}
-                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                    maxLength={LIMITES_CAMPOS.emailDocente}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground dark:text-gray-400">
-                    Telefone *
-                  </label>
-                  <Input
-                    type="tel"
-                    value={telefoneDocente}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
-                    className="bg-blue-50 border-blue-50 dark:bg-[#141414] dark:border-[#141414] dark:text-white"
-                    maxLength={15}
-                    placeholder="(XX) XXXXX-XXXX"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-sm text-muted-foreground mb-4 dark:text-gray-400">
-                    Seleção de disciplinas *
-                  </h3>
-                  {loading ? (
-                    <p>Carregando disciplinas...</p>
-                  ) : error ? (
-                    <p className="text-red-500">{error}</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {disciplinas.map((disciplina) => (
-                        <div
-                          key={disciplina.id}
-                          className="flex items-center space-x-2 dark:text-white"
-                        >
-                          <Checkbox
-                            id={`disciplina-${disciplina.id}`}
-                            checked={disciplineId.includes(disciplina.id)}
-                            onCheckedChange={() =>
-                              handleDisciplineSelection(disciplina.id)
-                            }
-                          />
-                          <label htmlFor={`disciplina-${disciplina.id}`}>
-                            {disciplina.nomeDisciplina}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-center">
-                <Button
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-8"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Criando..." : "Criar professor"}
-                </Button>
-              </div>
-            </div>
           </div>
-          
+
           <ModalCreate
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
