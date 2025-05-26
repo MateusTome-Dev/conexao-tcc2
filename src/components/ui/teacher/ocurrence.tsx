@@ -6,11 +6,13 @@ import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { useParams } from "next/navigation";
 
 export default function Ocurrence() {
   const [feedback, setFeedback] = useState("");
   const [feedbackType, setFeedbackType] = useState("");
-
+  const params = useParams();
+    const studentId = params.id as string; // Obtém o ID da rota
   const enviarFeedback = async () => {
     try {
       if (feedback.length > 100 ) {
@@ -44,6 +46,9 @@ export default function Ocurrence() {
               id: userIdInt,
             },
             conteudo: feedback,
+           recipientStudent: {
+            id: studentId, // ID do aluno obtido da rota
+           }
           }),
         }
       );
