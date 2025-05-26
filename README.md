@@ -1,53 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## OnAcademy: Revolucionando o Ensino 📚💡
+[![licence mit](https://img.shields.io/badge/licence-MIT-blue.svg)](./LICENSE)
 
-## Getting Started
+O aplicativo tem como objetivo aprimorar a experiência educacional, oferecendo ferramentas para acompanhar o desempenho dos alunos por meio de gráficos interativos e análise de porcentagens de notas. 
 
-First, run the development server:
+## Motivação
+A OnAcademy surgiu da necessidade de transformar a maneira como acompanhamos e gerenciamos o desempenho acadêmico. Percebemos que, embora o conceito de avaliação de conduta já exista, ele muitas vezes fica engessado em sistemas ultrapassados, sem transparência ou interação real com alunos e professores.
+Nossa motivação foi criar muito mais do que uma plataforma de registros: queríamos desenvolver uma ferramenta viva, que não apenas organiza informações, mas também promove engajamento, reconhecimento e melhoria contínua.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Sobre o Projeto
+Nosso projeto propõe a criação de um ambiente digital onde alunos, professores e gestores possam se conectar, acompanhar o desenvolvimento acadêmico e construir uma educação mais significativa através de:
+- Centralização Acessível: Uma plataforma intuitiva que reúne todas as informações acadêmicas em um só lugar, tornando o acompanhamento do desempenho mais prático e transparente para alunos, professores e gestores.
+- Carômetro Modernizado: Vamos além do conceito tradicional, oferecendo um sistema dinâmico para registro e consulta de advertências (positivas e negativas), incentivando a autorreflexão e o crescimento contínuo.
+- Comunicação Eficiente: Ferramentas integradas de feedback e relatórios que facilitam o diálogo entre todos os usuários, promovendo uma gestão escolar mais colaborativa e ágil.
+- Formulário Socioemocional: Além do sistema dinâmico para registro de advertências, incluímos um formulário socioemocional integrado para mapear habilidades como: Autoconhecimento e autocontrole, habilidades sociais e empatia, resiliência e gestão emocional.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+  ## Contribuir
+  
+  ### O que devo ter em mente antes de abrir um Pull Request?
+- Este é um projeto open-source feito por um grupo de alunos destinado à comunidade, e contribuições são bem-vindas.
+- Para aumentar a chance de sua contribuição ser aprovada, escolha um título claro, simples e explicativo para os itens, e siga a formatação correta dos arquivos.
+- No momento, não estamos buscando novas carreiras. Queremos refinar as que já temos.
+- É mais interessante ajudar com o código e o projeto em si.
+- 🇧🇷: Quer contribuir com o projeto? [Confira o passo a passo](./CONTRIBUTING.md)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## License / Licença do Projeto
+- [MIT](./LICENSE)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Agradecimentos
+> Aos contribuidores Ana Beatriz Loureiro, Danilo Oliveira, Felipe Lima, Gabriele Brito, Gyovanna Pereira, Mateus Tome, Rafael Augusto, Roger Lemos.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-npm i --force
-npm i dotenv --force
-npm install lucide-react --force
-npm install react-circular-progressbar --force
-npm install -D tailwind-scrollbar --force
-npm install @headlessui/react --force
-npm i react-icons --force
-npm install recharts react-select --force
-npm install @fullcalendar/react @fullcalendar/daygrid @fullcalendar/interaction @fullcalendar/timegrid @headlessui/react @heroicons/react --force
-npm install jsonwebtoken --force
-npm install js-cookie --force
-npm i --save-dev @types/js-cookie --force
-npm install @radix-ui/react-toast --force
-npm install @radix-ui/react-label --force
-npm install @radix-ui/react-dialog --force
-npm install react-toastify --force
-npm install react-loading-skeleton --force
