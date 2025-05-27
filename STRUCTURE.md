@@ -40,183 +40,232 @@ Ou você pode instalar todas as dependências principais com o comando:
 ```
 
 4. Pronto 🎉
-
 ## OnAcademy
 ### Estrutura do Projeto
 
-- `.next`: Armazena arquivos temporários e configurações internas do Expo para rodar o aplicativo no ambiente de desenvolvimento.
-- `node_modules`: Armazena arquivos temporários e configurações internas do Expo para rodar o aplicativo no ambiente de desenvolvimento.
-- `public`: Armazena arquivos temporários e configurações internas do Expo para rodar o aplicativo no ambiente de desenvolvimento.
-- `./src`: Armazena arquivos temporários e configurações internas do Expo para rodar o aplicativo no ambiente de desenvolvimento.
-  - `./src/app`:
-    - `./src/app/api`:
-      - `./src/app/api/chat`:
-        - `./src/app/api/chat/route.ts`:
-    - `./src/app/institution`:
-      - `./src/app/institution/class`:
-        - `./src/app/institution/class/createclass`:
-          - `./src/app/institution/class/createclass/page.tsx`:
-        - `./src/app/institution/class/editeclass`:
-          - `./src/app/institution/class/editeclass/page.tsx`:
-        - `./src/app/institution/class/viewclass`:
-          - `./src/app/institution/class/viewclass/[id]`:
-            - `./src/app/institution/class/viewclass/[id]/page.tsx`:
-          - `./src/app/institution/class/page.tsx`:
-      - `./src/app/institution/event`:
-        - `./src/app/institution/event/page.tsx`:
-      - `./src/app/institution/student`:
-        - `./src/app/institution/student/createStudent`:
-          - `./src/app/institution/student/createStudent/[id]`:
-            - `./src/app/institution/student/createStudent/[id]/page.tsx`:
-          - `./src/app/institution/student/createStudent/csv`:
-            - `./src/app/institution/student/createStudent/csv/page.tsx`:
-        - `./src/app/institution/student/editprofile`:
-          -`./src/app/institution/student/editprofile/[id]`:
-            - `./src/app/institution/student/editprofile/[id]/page.tsx`:
-        -`./src/app/institution/student/notes`:
-          -`./src/app/institution/student/notes/[id]`:
-            -`./src/app/institution/student/notes/[id]/page.tsx`:
-        -`./src/app/institution/profile`:
-          - `./src/app/institution/profile/[id]`:
-            -`./src/app/institution/profile/[id]/page.tsx`:
-          -`./src/app/institution/profile/feedback`:
-            - `./src/app/institution/profile/feedback/[id]`:
-              -`./src/app/institution/profile/feedback/[id]/page.tsx`:
-      - `./src/app/institution/teacher`:
-        - `./src/app/institution/teacher/profile`:
-          - `./src/app/institution/teacher/profile/createprofile`:
-            - `./src/app/institution/teacher/profile/createprofile/page.tsx`:
-          - `./src/app/institution/teacher/profile/editprofile`:
-            - `./src/app/institution/teacher/profile/editprofile/[id]`:
-              - `./src/app/institution/teacher/profile/editprofile/[id]/page.tsx`:
-            - `./src/app/institution/teacher/profile/viewprofile`:
-              - `./src/app/institution/teacher/profile/viewprofile/[id]`:
-                -`./src/app/institution/teacher/profile/viewprofile/[id]/page.tsx`:
-            - `./src/app/institution/teacher/page.tsx`:
-      - `./src/app/institution/page.tsx`:
-      - `./src/app/student`:
-        - `./src/app/student/chatbox`:
-          - `./src/app/student/chatbox/page.tsx`:      
-        - `./src/app/student/event`:
-          - `./src/app/student/event/page.tsx`:
-        - `./src/app/student/feedback`:
-          - `./src/app/student/feedback/page.tsx`:
-        - `./src/app/student/form`:
-          - `./src/app/student/form/page.tsx`:
-        - `./src/app/student/notes`:
-          - `./src/app/student/notes/page.tsx`:
-        - `./src/app/student/profile`:
-          - `./src/app/student/profile/page.tsx`:
-        - `./src/app/student/page.tsx`:
-      - `./src/app/teacher`:
-        - `./src/app/teacher/class`:
-          - `./src/app/teacher/class/page.tsx`:
-        - `./src/app/teacher/event`:
-          - `./src/app/teacher/event/page.tsx`:
-        - `./src/app/teacher/feedback`:
-          - `./src/app/teacher/feedback/studentsFeedback`:
-            - `./src/app/teacher/feedback/studentsFeedback/[id]`:
-              - `./src/app/teacher/feedback/studentsFeedback/[id]/page.tsx`:
-            - `./src/app/teacher/feedback/studentsFeedback/studentProfile`:
-              - `./src/app/teacher/feedback/studentsFeedback/studentProfile/[id]`:
-                - `./src/app/teacher/feedback/studentsFeedback/studentProfile/[id]/page.tsx`:
-              - `./src/app/teacher/feedback/studentsFeedback/page.tsx`:
-            - `./src/app/teacher/feedback/page.tsx`:
-        - `./src/app/teacher/profile`:
-          - `./src/app/teacher/profile/page.tsx`:
-        - `./src/app/teacher/students`:
-          - `./src/app/teacher/students/[id]`:
-            - `./src/app/teacher/students/[id]/page.tsx`:
-          - `./src/app/teacher/students/notes`:
-            - `./src/app/teacher/students/notes/[id]`:
-              - `./src/app/teacher/students/notes/[id]/page.tsx`:
-            - `./src/app/teacher/students/profile`:
-              - `./src/app/teacher/students/profile/[id]`:
-                - `./src/app/teacher/students/profile/[id]/page.tsx`:
-            - `./src/app/teacher/students/page.tsx`:
-          - `./src/app/teacher/students/profile`:
-        - `./src/app/institution/teacher/page.tsx`:
-        
-      - `./src/app/favicon.ico`:
-      - `./src/app/layout.tsx`:
-      - `./src/app/page.tsx`
+- `.next`: Diretório gerado automaticamente pelo Next.js contendo os arquivos otimizados para produção, cache de construção e configurações internas do framework. É recriado a cada build e não deve ser commitado no versionamento.
 
-  - `./src/app/assets`:
-    - `./src/app/assets/images`:
-  - `./src/app/components`:
-      - `./src/app/components/layout`:
-        - `./src/app/components/layout/sidbar.tsx`:
-        - `./src/app/components/layout/sidbarInstitution.tsx`:
-        - `./src/app/components/layout/sidbarTeacher.tsx`:
-    - `./src/app/components/modals`:
-      - `./src/app/components/modals/modalCreate.tsx`:
-      - `./src/app/components/modals/modalFloatingButton.tsx`:
-      - `./src/app/components/modals/modalSidebar.tsx`:
-      - `./src/app/components/modals/modelDelete.tsx`:
-    - `./src/app/components/ui`:
-      - `./src/app/components/ui/alunos`:
-        - `./src/app/components/ui/alunos/avatar.tsx`:
-        - `./src/app/components/ui/alunos/biggerCalendar.tsx`:
-        - `./src/app/components/ui/alunos/button.tsx`:
-        - `./src/app/components/ui/alunos/calendar.tsx`:
-        - `./src/app/components/ui/alunos/card.tsx`:
-        - `./src/app/components/ui/alunos/cardFeedback.tsx`:
-        - `./src/app/components/ui/alunos/cardFeedbackStudent.tsx`:
-        - `./src/app/components/ui/alunos/chart.tsx`:
-        - `./src/app/components/ui/alunos/chartFeedback.tsx`:
-        - `./src/app/components/ui/alunos/downloadButton.tsx`:
-        - `./src/app/components/ui/alunos/event-list.tsx`:
-        - `./src/app/components/ui/alunos/event-sidebar.tsx`:
-        - `./src/app/components/ui/alunos/gradeCard.tsx`:
-        - `./src/app/components/ui/alunos/mediaCard.tsx`:
-        - `./src/app/components/ui/alunos/messageList.tsx`:
-        - `./src/app/components/ui/alunos/occurrences-table.tsx`:
-        - `./src/app/components/ui/alunos/profile-card.tsx`:
-        - `./src/app/components/ui/alunos/profile.tsx`:
-        - `./src/app/components/ui/alunos/progress.tsx`:
-        - `./src/app/components/ui/alunos/select.tsx`:
-        - `./src/app/components/ui/alunos/smallselect.tsx`:
-        - `./src/app/components/ui/alunos/table.tsx`:
-       - `./src/app/components/ui/institution`:
-         - `./src/app/components/ui/institution/biggerCalendar.tsx`:
-         - `./src/app/components/ui/institution/button.tsx`:
-         - `./src/app/components/ui/institution/buttonEdit.tsx`:
-         - `./src/app/components/ui/institution/buttonSubmit.tsx`:
-         - `./src/app/components/ui/institution/cardFeedback.tsx`:
-         - `./src/app/components/ui/institution/checkbox.tsx`:
-         - `./src/app/components/ui/institution/dialog.tsx`:
-         - `./src/app/components/ui/institution/FloatingButton.tsx`:
-         - `./src/app/components/ui/institution/floatingButtonClass.tsx`:
-         - `./src/app/components/ui/institution/gradeTableStudents.tsx`:
-         - `./src/app/components/ui/institution/input.tsx`:
-         - `./src/app/components/ui/institution/InputImage.tsx`:
-         - `./src/app/components/ui/institution/label.tsx`:
-         - `./src/app/components/ui/institution/messageList.tsx`:
-         - `./src/app/components/ui/institution/noticeCard.tsx`:
-         - `./src/app/components/ui/institution/profile.tsx`:
-         - `./src/app/components/ui/institution/select.tsx`:
-         - `./src/app/components/ui/institution/smallselect.tsx`:
-         - `./src/app/components/ui/institution/textarea.tsx`:
-         - `./src/app/components/ui/institution/toast.tsx`:
-         - `./src/app/components/ui/institution/use-toast.ts`:
-      - `./src/app/components/ui/teacher`:
-        - `./src/app/components/ui/teacher/calendar.tsx`:
-        - `./src/app/components/ui/teacher/cardFeedbackTeacher.tsx`:
-        - `./src/app/components/ui/teacher/class.tsx`:
-        - `./src/app/components/ui/teacher/gradeTableStudents.tsx`:
-        - `./src/app/components/ui/teacher/messageList.tsx`:
-        - `./src/app/components/ui/teacher/noticeCard.tsx`:
-        - `./src/app/components/ui/teacher/ocurrence.tsx`:
-        - `./src/app/components/ui/teacher/ocurrenceTable.tsx`:
-        - `./src/app/components/ui/teacher/profile.tsx`:
-        - `./src/app/components/ui/teacher/profileStudent.tsx`:
-        - `./src/app/components/ui/teacher/questions.tsx`:
-        - `./src/app/components/ui/teacher/user.tsx`:
-      - `./src/app/components/ui/globalTablePerformance.tsx`:
-      - `./src/app/components/ui/lateralCalendar.tsx`:
-      - `./src/app/components/ui/search.tsx`:
-      - `./src/app/components/ui/smallSelect.tsx`:
-      - `./src/app/components/ui/tablePerfomance.tsx`:
-      - `./src/app/components/ui/welcomeMessage.tsx`:
-      - `./src/app/components/ui/welcomeUser.tsx`:
-    - `./src/app/components/ThemeProvider.tsx`:
+- `node_modules`: Armazena todas as dependências do projeto instaladas via npm. Cada pacote listado no package.json é baixado e instalado aqui. Este diretório é regenerado automaticamente quando você executa `npm install`.
+
+- `public`: Diretório para arquivos estáticos acessíveis publicamente, incluindo:
+  - Imagens compartilhadas
+  - Ícones de favoritos (favicon)
+  - Arquivos de fontes
+  - Outros recursos que podem ser referenciados diretamente via URL
+
+- `./src`: Contém todo o código-fonte da aplicação organizado de forma modular:
+  - `./src/app`: Implementa o sistema de roteamento principal usando o App Router do Next.js 13+
+    - `./src/app/api`: Endpoints da API interna
+      - `./src/app/api/chat`: Funcionalidades relacionadas ao chat
+        - `./src/app/api/chat/route.ts`: Implementação das rotas de API para o sistema de mensagens
+
+    - `./src/app/institution`: Área administrativa da instituição de ensino
+      - `./src/app/institution/class`: Gerenciamento de turmas
+        - `./src/app/institution/class/createclass`: Criação de novas turmas
+          - `./src/app/institution/class/createclass/page.tsx`: Formulário de cadastro de turmas
+        - `./src/app/institution/class/editeclass`: Edição de turmas existentes
+          - `./src/app/institution/class/editeclass/page.tsx`: Interface de edição
+        - `./src/app/institution/class/viewclass`: Visualização de turmas
+          - `./src/app/institution/class/viewclass/[id]`: Página dinâmica por ID
+            - `./src/app/institution/class/viewclass/[id]/page.tsx`: Detalhes da turma específica
+
+      - `./src/app/institution/event`: Gerenciamento de eventos acadêmicos
+        - `./src/app/institution/event/page.tsx`: Calendário e lista de eventos
+
+      - `./src/app/institution/student`: Gestão de alunos
+        - `./src/app/institution/student/createStudent`: Cadastro de estudantes
+          - `./src/app/institution/student/createStudent/[id]`: Edição por ID
+            - `./src/app/institution/student/createStudent/[id]/page.tsx`: Formulário de aluno
+          - `./src/app/institution/student/createStudent/csv`: Importação em massa
+            - `./src/app/institution/student/createStudent/csv/page.tsx`: Upload de CSV
+
+        - `./src/app/institution/student/editprofile`: Edição de perfis
+          - `./src/app/institution/student/editprofile/[id]`: Edição específica
+            - `./src/app/institution/student/editprofile/[id]/page.tsx`: Formulário de edição
+
+        - `./src/app/institution/student/notes`: Gestão de notas
+          - `./src/app/institution/student/notes/[id]`: Notas por aluno
+            - `./src/app/institution/student/notes/[id]/page.tsx`: Lançamento de notas
+
+        - `./src/app/institution/profile`: Perfis institucionais
+          - `./src/app/institution/profile/[id]`: Visualização por ID
+            - `./src/app/institution/profile/[id]/page.tsx`: Perfil completo
+          - `./src/app/institution/profile/feedback`: Sistema de feedbacks
+            - `./src/app/institution/profile/feedback/[id]`: Feedback específico
+              - `./src/app/institution/profile/feedback/[id]/page.tsx`: Detalhes do feedback
+
+      - `./src/app/institution/teacher`: Gestão de professores
+        - `./src/app/institution/teacher/profile`: Perfis docentes
+          - `./src/app/institution/teacher/profile/createprofile`: Criação de perfil
+            - `./src/app/institution/teacher/profile/createprofile/page.tsx`: Formulário de cadastro
+          - `./src/app/institution/teacher/profile/editprofile`: Edição de perfil
+            - `./src/app/institution/teacher/profile/editprofile/[id]`: Edição por ID
+              - `./src/app/institution/teacher/profile/editprofile/[id]/page.tsx`: Formulário de edição
+          - `./src/app/institution/teacher/profile/viewprofile`: Visualização
+            - `./src/app/institution/teacher/profile/viewprofile/[id]`: Perfil específico
+              - `./src/app/institution/teacher/profile/viewprofile/[id]/page.tsx`: Detalhes do professor
+
+    - `./src/app/student`: Área do estudante
+      - `./src/app/student/chatbox`: Sistema de mensagens
+        - `./src/app/student/chatbox/page.tsx`: Interface de chat
+      - `./src/app/student/event`: Eventos acadêmicos
+        - `./src/app/student/event/page.tsx`: Calendário estudantil
+      - `./src/app/student/feedback`: Feedbacks recebidos
+        - `./src/app/student/feedback/page.tsx`: Listagem de avaliações
+      - `./src/app/student/form`: Formulários acadêmicos
+        - `./src/app/student/form/page.tsx`: Formulários disponíveis
+      - `./src/app/student/notes`: Notas do aluno
+        - `./src/app/student/notes/page.tsx`: Boletim e resultados
+      - `./src/app/student/profile`: Perfil pessoal
+        - `./src/app/student/profile/page.tsx`: Dados do estudante
+
+    - `./src/app/teacher`: Área do professor
+      - `./src/app/teacher/class`: Gestão de turmas
+        - `./src/app/teacher/class/page.tsx`: Lista de classes
+      - `./src/app/teacher/event`: Eventos docentes
+        - `./src/app/teacher/event/page.tsx`: Agenda do professor
+      - `./src/app/teacher/feedback`: Sistema de avaliações
+        - `./src/app/teacher/feedback/studentsFeedback`: Feedbacks por aluno
+          - `./src/app/teacher/feedback/studentsFeedback/[id]`: Avaliação específica
+            - `./src/app/teacher/feedback/studentsFeedback/[id]/page.tsx`: Formulário de feedback
+          - `./src/app/teacher/feedback/studentsFeedback/studentProfile`: Perfis avaliados
+            - `./src/app/teacher/feedback/studentsFeedback/studentProfile/[id]`: Perfil do aluno
+              - `./src/app/teacher/feedback/studentsFeedback/studentProfile/[id]/page.tsx`: Dados do estudante
+
+      - `./src/app/teacher/profile`: Perfil docente
+        - `./src/app/teacher/profile/page.tsx`: Informações do professor
+      - `./src/app/teacher/students`: Gestão de alunos
+        - `./src/app/teacher/students/[id]`: Estudante específico
+          - `./src/app/teacher/students/[id]/page.tsx`: Ficha do aluno
+        - `./src/app/teacher/students/notes`: Lançamento de notas
+          - `./src/app/teacher/students/notes/[id]`: Notas por aluno
+            - `./src/app/teacher/students/notes/[id]/page.tsx`: Sistema de avaliações
+        - `./src/app/teacher/students/profile`: Perfis estudantis
+          - `./src/app/teacher/students/profile/[id]`: Perfil específico
+            - `./src/app/teacher/students/profile/[id]/page.tsx`: Dados completos
+
+    - `./src/app/favicon.ico`: Ícone exibido na aba do navegador
+    - `./src/app/layout.tsx`: Layout principal da aplicação
+    - `./src/app/page.tsx`: Página inicial do sistema
+
+  - `./src/app/assets`: Recursos estáticos
+    - `./src/app/assets/images`: Imagens utilizadas na aplicação
+
+  - `./src/app/components`: Biblioteca de componentes reutilizáveis
+    - `./src/app/components/layout`: Componentes estruturais
+      - `./src/app/components/layout/sidbar.tsx`: Barra lateral principal
+      - `./src/app/components/layout/sidbarInstitution.tsx`: Sidebar para administradores
+      - `./src/app/components/layout/sidbarTeacher.tsx`: Navegação para professores
+
+    - `./src/app/components/modals`: Janelas modais
+      - `./src/app/components/modals/modalCreate.tsx`: Modal de criação genérica
+      - `./src/app/components/modals/modalFloatingButton.tsx`: Modal com botão flutuante
+      - `./src/app/components/modals/modalSidebar.tsx`: Modal lateral
+      - `./src/app/components/modals/modelDelete.tsx`: Confirmação de exclusão
+
+    - `./src/app/components/ui`: Biblioteca de componentes de interface agrupados por contexto
+  - `./src/app/components/ui/alunos`: Componentes específicos para o perfil de estudante
+    - **Elementos de Interface**:
+      - `avatar.tsx`: Componente de avatar do aluno
+      - `button.tsx`: Botões customizados para ações estudantis
+      - `select.tsx` / `smallselect.tsx`: Dropdowns para seleção
+    - **Cards & Containers**:
+      - `card.tsx`: Card base reutilizável
+      - `cardFeedback.tsx` / `cardFeedbackStudent.tsx`: Cards de feedback
+      - `gradeCard.tsx`: Card de notas acadêmicas
+      - `mediaCard.tsx`: Card para conteúdo multimídia
+      - `profile-card.tsx`: Card resumo do perfil
+    - **Visualização de Dados**:
+      - `chart.tsx` / `chartFeedback.tsx`: Componentes gráficos
+      - `table.tsx`: Tabela base
+      - `occurrences-table.tsx`: Tabela de ocorrências
+      - `progress.tsx`: Barra/indicador de progresso
+    - **Agendamento**:
+      - `calendar.tsx`: Calendário simplificado
+      - `biggerCalendar.tsx`: Calendário expandido
+      - `event-list.tsx`: Listagem de eventos
+      - `event-sidebar.tsx`: Painel lateral de eventos
+    - **Comunicação**:
+      - `messageList.tsx`: Listagem de mensagens
+      - `downloadButton.tsx`: Botão para downloads
+    - **Perfil**:
+      - `profile.tsx`: Página completa de perfil
+
+  - `./src/app/components/ui/institution`: Componentes para administradores institucionais
+    - **Formulários**:
+      - `input.tsx`: Campo de entrada básico
+      - `textarea.tsx`: Área de texto
+      - `checkbox.tsx`: Checkbox customizado
+      - `InputImage.tsx`: Upload de imagens
+      - `select.tsx` / `smallselect.tsx`: Seletores
+      - `label.tsx`: Rótulos para formulários
+    - **Interação**:
+      - `button.tsx` / `buttonEdit.tsx` / `buttonSubmit.tsx`: Botões primários
+      - `FloatingButton.tsx` / `floatingButtonClass.tsx`: Botões flutuantes
+      - `dialog.tsx`: Diálogos modais
+    - **Feedback & Notificações**:
+      - `toast.tsx`: Sistema de notificações toast
+      - `use-toast.ts`: Hook para gerenciar toasts
+      - `cardFeedback.tsx`: Cards de feedback
+      - `noticeCard.tsx`: Cards de avisos
+    - **Visualização de Dados**:
+      - `biggerCalendar.tsx`: Calendário institucional
+      - `gradeTableStudents.tsx`: Tabela de notas
+      - `messageList.tsx`: Listagem de mensagens
+      - `profile.tsx`: Componente de perfil institucional
+
+  - `./src/app/components/ui/teacher`: Componentes para o perfil docente
+    - **Gestão de Aula**:
+      - `class.tsx`: Componente de turmas
+      - `gradeTableStudents.tsx`: Lançador de notas
+      - `ocurrence.tsx` / `ocurrenceTable.tsx`: Registro de ocorrências
+      - `questions.tsx`: Gerenciador de questões
+    - **Visualização**:
+      - `calendar.tsx`: Agenda do professor
+      - `cardFeedbackTeacher.tsx`: Cards de feedback
+      - `noticeCard.tsx`: Cards de avisos
+      - `profile.tsx`: Perfil do professor
+      - `profileStudent.tsx`: Visualização de perfil de aluno
+    - **Comunicação**:
+      - `messageList.tsx`: Listagem de mensagens
+      - `user.tsx`: Componente de listagem de usuários
+
+  - **Componentes Compartilhados**:
+    - `globalTablePerformance.tsx`: Tabela de desempenho global
+    - `lateralCalendar.tsx`: Calendário lateral reutilizável
+    - `search.tsx`: Componente de busca unificado
+    - `smallSelect.tsx`: Select compacto
+    - `tablePerfomance.tsx`: Tabela de performance
+    - `welcomeMessage.tsx` / `welcomeUser.tsx`: Componentes de boas-vindas
+
+- `./src/app/components/ThemeProvider.tsx`: Provedor de temas para estilização global
+    - `./src/app/components/ThemeProvider.tsx`: Provedor de temas para estilização
+
+  - `./src/app/hooks`: Hooks customizados
+    - `./src/app/hooks/use-media-query.ts`: Hook para responsive design
+
+  - `./src/app/lib`: Utilitários e helpers
+    - `./src/app/lib/utils.ts`: Funções utilitárias compartilhadas
+
+  - `./src/app/styles`: Estilos globais
+    - `./src/app/styles/globals.css`: Estilos CSS aplicados globalmente
+
+  - `./src/app/types`: Definições TypeScript
+    - `./src/app/types/event.ts`: Tipos para eventos acadêmicos
+    - `./src/app/types/select.ts`: Tipos para componentes de seleção
+
+  - `./src/app/middleware.ts`: Middleware para tratamento de rotas e autenticação
+
+- `.eslintignore`: Configura quais arquivos o ESLint deve ignorar na análise
+- `.gitignore`: Especifica quais arquivos não devem ser versionados
+- `CONTRIBUTING.md`: Diretrizes para contribuição no projeto
+- `LICENSE`: Licença de uso do software
+- `README.md`: Documentação principal do projeto
+- `STRUCTURE.md`: Documentação da estrutura de arquivos
+- `eslint.config.mjs`: Configuração do linter ESLint
+- `next.config.ts`: Configurações customizadas do Next.js
+- `package-lock.json`: Versões exatas das dependências
+- `package.json`: Manifesto do projeto com scripts e dependências
+- `postcss.config.mjs`: Configuração do PostCSS
+- `tailwind.config.ts`: Configuração do Tailwind CSS
+- `tsconfig.json`: Configuração do TypeScript
