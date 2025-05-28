@@ -51,7 +51,7 @@ export default function ChatPage() {
         messages: [
           {
             role: "system",
-            content: "Você é um assistente útil que responde em português brasileiro de forma clara e concisa."
+            content: "Você é um assistente de apoio emocional profissional chamado ONA. Seja empático, atencioso e ofereça suporte emocional. Mantenha as respostas claras e focadas no usuário"
           },
           ...messages.map(msg => ({
             role: msg.role,
