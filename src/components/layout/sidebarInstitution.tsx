@@ -79,7 +79,7 @@ const SidebarInstitution = () => {
           throw new Error("ID do usuário não encontrado no token");
         }
   
-        const apiUrl = `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/institution/${userId}`;
+        const apiUrl = `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/institution/${userId}`;
         
         console.log("Fazendo requisição para:", apiUrl); // Debug
   
