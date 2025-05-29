@@ -149,7 +149,7 @@ export default function Profile() {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${id}`
+          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`
         );
         if (!response.ok) throw new Error("Falha ao buscar dados do aluno");
 
@@ -232,7 +232,7 @@ export default function Profile() {
 
     try {
       const response = await fetch(
-        `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${id}`,
+        `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`,
         {
           method: "PUT",
           headers: {
