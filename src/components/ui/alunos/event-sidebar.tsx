@@ -185,7 +185,6 @@ export function EventSidebar() {
                     {selectedEvent?.localEvento ||
                       "Cotia SP, Senai Ricardo Lerner"}
                     <br />
-                    06708-280
                   </p>
                 </div>
               </div>
