@@ -3,6 +3,8 @@
 
 O aplicativo tem como objetivo aprimorar a experiência educacional, oferecendo ferramentas para acompanhar o desempenho dos alunos por meio de gráficos interativos e análise de porcentagens de notas. 
 
+![Banner marketing site estratégia digital roxo branco azul](https://github.com/user-attachments/assets/c5ae40df-a308-44e0-b78a-eabcf290cbb9)
+
 ## Motivação
 A OnAcademy surgiu da necessidade de transformar a maneira como acompanhamos e gerenciamos o desempenho acadêmico. Percebemos que, embora o conceito de avaliação de conduta já exista, ele muitas vezes fica engessado em sistemas ultrapassados, sem transparência ou interação real com alunos e professores.
 Nossa motivação foi criar muito mais do que uma plataforma de registros: queríamos desenvolver uma ferramenta viva, que não apenas organiza informações, mas também promove engajamento, reconhecimento e melhoria contínua.
