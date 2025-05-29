@@ -19,6 +19,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 
+const LIMITES_CAMPOS = {
+  nomeTurma: 50,
+  salaTurma: 5,
+  capacidadeMaxima: 40,
+};
+
 export default function CreateClass() {
   // Estados para armazenar os dados do formulário e seleções
   const [docentes, setDocentes] = useState([]); // Lista de professores
@@ -73,70 +79,105 @@ export default function CreateClass() {
 
   // Função principal para criar uma nova turma
   const criarTurma = async () => {
-    const token = localStorage.getItem("token");
+  // Validação dos campos
+  if (!nomeTurma.trim()) {
+    toast.warn("Nome da turma é obrigatório");
+    return;
+  }
 
-    // Verifica se o token JWT existe
-    if (!token) {
-      console.error("❌ Token JWT não encontrado!");
-      toast.warn("Usuário não autenticado. Faça login novamente.");
-      return;
-    }
+  if (nomeTurma.length > LIMITES_CAMPOS.nomeTurma) {
+    toast.warn(`Nome da turma deve ter no máximo ${LIMITES_CAMPOS.nomeTurma} caracteres`);
+    return;
+  }
 
-    // Validação dos campos obrigatórios
-    if (
-      !nomeTurma ||
-      !anoLetivoTurma ||
-      !periodoTurma ||
-      !capacidadeTurma ||
-      !salaTurma
-    ) {
-      console.error("❌ O ano letivo está vazio!");
-      toast.warn("Preencha todos os campos.");
-      return;
-    }
+  if (!anoLetivoTurma) {
+    toast.warn("Ano letivo é obrigatório");
+    return;
+  }
 
-    // Preparação do payload para a API
-    const payload = {
-      nomeTurma,
-      anoLetivoTurma: parseInt(anoLetivoTurma, 10), // Converte para número
-      periodoTurma,
-      capacidadeMaximaTurma: capacidadeTurma,
-      salaTurma,
-      idTeacher, // IDs dos professores selecionados
-      disciplineId, // IDs das disciplinas selecionadas
-    };
+  if (!periodoTurma) {
+    toast.warn("Período é obrigatório");
+    return;
+  }
 
-    try {
-      // Chamada para a API para criar a turma
-      const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-      
-      // Verifica se a resposta foi bem-sucedida
-      if (!response.ok) {
-        throw new Error("Erro ao criar a turma.");
-      }
+  if (!capacidadeTurma) {
+    toast.warn("Capacidade é obrigatória");
+    return;
+  }
 
-      // Feedback de sucesso para o usuário
-      toast.success("Turma criada com sucesso!");
+  const capacidade = Number(capacidadeTurma);
+  if (isNaN(capacidade) || capacidade <= 0 || capacidade > LIMITES_CAMPOS.capacidadeMaxima) {
+    toast.warn(`Capacidade deve ser um número entre 1 e ${LIMITES_CAMPOS.capacidadeMaxima}`);
+    return;
+  }
 
-      // Redireciona após 2 segundos
-      setTimeout(() => {
-        router.push("/institution/class");
-      }, 2000);
-    } catch (error) {
-      console.error("❌ Erro ao criar turma:", error);
-      console.log(payload);
+  if (!salaTurma.trim()) {
+    toast.warn("Sala é obrigatória");
+    return;
+  }
 
-      // Feedback de erro para o usuário
-      toast.error("Erro ao criar turma.");
-    }
+  if (!/^\d+$/.test(salaTurma)) {
+    toast.warn("O número da sala deve conter apenas dígitos numéricos");
+    return;
+  }
+
+  if (salaTurma.length > LIMITES_CAMPOS.salaTurma) {
+    toast.warn(`Sala deve ter no máximo ${LIMITES_CAMPOS.salaTurma} caracteres`);
+    return;
+  }
+
+  if (idTeacher.length === 0) {
+    toast.warn("Selecione pelo menos um professor");
+    return;
+  }
+
+  if (disciplineId.length === 0) {
+    toast.warn("Selecione pelo menos uma disciplina");
+    return;
+  }
+
+  // Se passou por todas as validações, prossegue com a criação
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    toast.warn("Usuário não autenticado. Faça login novamente.");
+    return;
+  }
+
+  const payload = {
+    nomeTurma,
+    anoLetivoTurma: parseInt(anoLetivoTurma, 10),
+    periodoTurma,
+    capacidadeMaximaTurma: capacidadeTurma,
+    salaTurma,
+    idTeacher,
+    disciplineId,
   };
+
+  try {
+    const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    
+    if (!response.ok) {
+      throw new Error("Erro ao criar a turma.");
+    }
+
+    toast.success("Turma criada com sucesso!");
+
+    setTimeout(() => {
+      router.push("/institution/class");
+    }, 2000);
+  } catch (error) {
+    console.error("Erro ao criar turma:", error);
+    toast.error("Erro ao criar turma.");
+  }
+};
 
   // Renderização do componente
   return (
