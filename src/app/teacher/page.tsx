@@ -50,7 +50,7 @@ export default function DashboardTeacher() {
 
         // Faz requisição para a API
         const response = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${userId}`,
+          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

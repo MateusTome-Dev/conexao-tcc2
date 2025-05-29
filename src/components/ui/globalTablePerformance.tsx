@@ -42,7 +42,7 @@ const EngagementChartGlobal: React.FC = () => {
 
       if (!classId) throw new Error("ID da turma não encontrado na URL")
 
-      const resposta = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class/feedback/${classId}`, {
+      const resposta = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class/feedback/${classId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

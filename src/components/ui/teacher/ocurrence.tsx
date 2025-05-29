@@ -35,7 +35,7 @@ export default function Ocurrence() {
         throw new Error("ID do usuário não é um número válido");
 
       const response = await fetch(
-        "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/student",
+        "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/student",
         {
           method: "POST",
           headers: {

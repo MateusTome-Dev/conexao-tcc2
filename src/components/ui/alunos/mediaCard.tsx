@@ -20,7 +20,7 @@ export function MediaCard({ atualizarMedia }: { atualizarMedia: (media: number) 
         const userId = decoded?.sub;
         if (!userId) throw new Error("ID do usuário não encontrado no token");
 
-        const resposta = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${userId}`);
+        const resposta = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${userId}`);
         if (!resposta.ok) {
           throw new Error("Falha ao buscar os dados");
         }

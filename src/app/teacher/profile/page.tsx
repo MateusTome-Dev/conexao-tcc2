@@ -51,7 +51,7 @@ export default function User({
       if (!id) throw new Error("ID do usuário não encontrado no token");
 
       // Faz a requisição para a API
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`);
+      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${id}`);
       if (!response.ok)
         throw new Error("Não foi possível carregar os dados do estudante");
 

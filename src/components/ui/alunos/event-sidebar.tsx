@@ -32,7 +32,7 @@ export function EventSidebar() {
     const fetchEvents = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/event");
+        const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/event");
 
         if (!response.ok) {
           throw new Error(`Error fetching events: ${response.status}`);

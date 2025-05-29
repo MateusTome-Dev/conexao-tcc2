@@ -53,7 +53,7 @@ export default function Notes({ value, className }: { value: number; className?:
       if (!userId) throw new Error('ID do usuário não encontrado no token');
       
       // 3. Faz a requisição para a API
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${userId}`);
+      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${userId}`);
       
       // 4. Verifica se a resposta foi bem sucedida
       if (!response.ok) {

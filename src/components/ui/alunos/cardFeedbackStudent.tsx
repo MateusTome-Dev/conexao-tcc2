@@ -79,7 +79,7 @@ export default function CardFeedback({ persons = [] }: CardFeedbackProps) {
       };
 
       const response = await fetch(
-        "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/feedbackStudent",
+        "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/feedbackStudent",
         {
           method: "POST",
           headers: {

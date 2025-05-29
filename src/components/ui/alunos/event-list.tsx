@@ -20,7 +20,7 @@ export function EventList({ className }: EventListProps) {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/event");
+        const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/event");
         const data: Event[] = await response.json();
 
         // Adiciona 1 dia a cada evento e filtra

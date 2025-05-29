@@ -37,7 +37,7 @@ function MessageList({ className }: { className?: string }) {
         if (!userId) throw new Error("ID do usuário não encontrado no token");
   
         const response = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${userId}`,
+          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${userId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ function MessageList({ className }: { className?: string }) {
     const fetchMessages = async () => {
       try {
         const reminderResponse = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/reminder/${turma}`
+          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/reminder/${turma}`
         );
   
         if (!reminderResponse.ok)

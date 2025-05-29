@@ -30,7 +30,7 @@ export function Class(){
           const id = decoded?.sub; // Extraindo o id do usuário do token
           if (!id) throw new Error("ID do usuário não encontrado no token");
    
-          const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`);
+          const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${id}`);
           if (!response.ok) throw new Error("Não foi possível carregar os dados do estudante");
    
           const data = await response.json();

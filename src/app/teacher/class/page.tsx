@@ -47,7 +47,7 @@ export default function CheckInEmocional() {
 
       // Faz a requisição para a API
       const response = await fetch(
-        `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/classes/${id}`
+        `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/classes/${id}`
       );
       if (!response.ok)
         throw new Error("Não foi possível carregar os dados do docente");
