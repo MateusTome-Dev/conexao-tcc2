@@ -8,6 +8,10 @@ interface Message {
   criadoPorNome: string;
   initials: string;
   color: string;
+  classStDTO: {
+    nomeTurma: string;
+    id?: number;
+  }[];
 }
 
 const avatarColors = [
@@ -26,7 +30,7 @@ function MessageList({ className }: { className?: string }) {
     const fetchMessages = async () => {
       try {
         const reminderResponse = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/reminder`
+          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/reminder`
         );
 
         if (!reminderResponse.ok) throw new Error("Nenhum aviso disponível.");
@@ -101,18 +105,24 @@ function MessageList({ className }: { className?: string }) {
                         message.criadoPorNome ||
                         "Não encontrado."}
                     </h3>
-                    <span className="text-gray-500 text-sm">
-                      {new Date(
-                        new Date(message.horarioSistema).getTime() -
-                          3 * 60 * 60 * 1000
-                      ).toLocaleString("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                    <div className="flex flex-col items-end">
+                      <span className="text-gray-500 text-sm">
+                        {new Date(
+                          new Date(message.horarioSistema).getTime() -
+                            3 * 60 * 60 * 1000
+                        ).toLocaleString("pt-BR", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      {/* Adicionando mensagem abaixo do horário */}
+                      <span className="text-gray-400 text-xs mt-1">
+                        {message.classStDTO[0]?.nomeTurma}
+                      </span>
+                    </div>
                   </div>
                   <p className="text-gray-600 dark:text-[#8A8A8A] text-sm mt-1 max-w-3xl break-words">
                     {message.conteudo}

@@ -170,7 +170,7 @@ export default function Profile() {
   useEffect(() => {
     setLoading(true);
     fetch(
-      "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/discipline"
+      "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/discipline"
     )
       .then((response) => response.json())
       .then((data: Disciplina[]) => {
@@ -275,7 +275,7 @@ export default function Profile() {
       const cleanedPhone = telefoneDocente.replace(/\D/g, "");
 
       const response = await fetch(
-        "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher",
+        "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher",
         {
           method: "POST",
           headers: {

@@ -64,7 +64,7 @@ export default function User() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
 
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${id}`, {
+      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -88,14 +88,14 @@ export default function User() {
       if (!token) throw new Error("Token não encontrado");
 
       // First remove teacher from classes
-      await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class-teacher?teacherId=${teacherId}`, {
+      await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class-teacher?teacherId=${teacherId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify({ teacherId: null }),
       });
 
       // Then delete the teacher
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/teacher/${teacherId}`, {
+      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${teacherId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -134,7 +134,7 @@ export default function User() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
 
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/feedbackStudent/teacher/${id}`, {
+      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/feedbackStudent/teacher/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

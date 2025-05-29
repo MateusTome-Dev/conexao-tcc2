@@ -212,7 +212,7 @@ const Table = () => {
         if (!userId) throw new Error("ID do usuário não encontrado no token")
 
         // Requisição para a API
-        const resposta = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${id}`)
+        const resposta = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`)
 
         if (!resposta.ok) {
           throw new Error("Falha ao buscar os dados")
@@ -284,7 +284,7 @@ const Table = () => {
       if (!token) throw new Error("Token não encontrado");
   
       // Endpoint para a requisição POST
-      const endpoint = "https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/note";
+      const endpoint = "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/note";
   
       // Corpo da requisição no formato especificado
       const corpo = {

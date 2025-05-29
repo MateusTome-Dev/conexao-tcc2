@@ -46,7 +46,7 @@ export default function CheckInEmocional({
   // Função para buscar os dados das turmas da API
   const fetchClassesData = async () => {
     try {
-      const response = await fetch("https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class")
+      const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class")
       if (!response.ok) throw new Error("Não foi possível carregar os dados das turmas")
 
       const data = await response.json()
@@ -62,7 +62,7 @@ export default function CheckInEmocional({
   // Função para deletar uma turma
   const deleteClass = async (id: number) => {
     try {
-      const response = await fetch(`https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/class/${id}`, {
+      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class/${id}`, {
         method: "DELETE",
       })
 
