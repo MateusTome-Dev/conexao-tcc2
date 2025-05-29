@@ -141,7 +141,7 @@ function MessageList({ className }: { className?: string }) {
                       )}
                     </span>
                   </div>
-                  <p className="text-gray-600 dark:text-[#8A8A8A] text-sm mt-1">
+                  <p className="text-gray-600 dark:text-[#8A8A8A] text-sm mt-1 max-w-3xl break-words max-lg:max-w-[220px]">
                     {message.conteudo}
                   </p>
                 </div>
