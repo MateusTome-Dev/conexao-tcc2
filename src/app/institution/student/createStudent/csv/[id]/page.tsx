@@ -156,7 +156,7 @@ export default function CSVImporter() {
     }
 
     setIsLoading(true);
-    setMessage("Validando e enviando dados para a API...");
+    setMessage("Validando e enviando dados...");
 
     try {
       // Transformação e validação inicial (mantida do código anterior)
