@@ -67,7 +67,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
       const token = localStorage.getItem("token")
       if (!token) throw new Error("Token não encontrado")
 
-      const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/event", {
+      const response = await fetch("https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/event", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -224,7 +224,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
       const token = localStorage.getItem("token")
       if (!token) throw new Error("Token não encontrado")
 
-      const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/event", {
+      const response = await fetch("https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/event", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -267,7 +267,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
       const token = localStorage.getItem("token")
       if (!token) throw new Error("Token não encontrado")
 
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/event/${selectedEvent.id}`, {
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/event/${selectedEvent.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -303,7 +303,7 @@ export default function ResponsiveCalendar({ onEventCreated }: BiggerCalendarPro
       const token = localStorage.getItem("token")
       if (!token) throw new Error("Token não encontrado")
 
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/event/${selectedEvent.id}`, {
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/event/${selectedEvent.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

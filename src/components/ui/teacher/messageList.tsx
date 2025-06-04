@@ -41,7 +41,7 @@ function MessageList({ className }: { className?: string }) {
 
         // 2️⃣ Buscar os avisos da turma
         const reminderResponse = await fetch(
-          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/reminder/teacher/${userId}`,
+          `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/reminder/teacher/${userId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

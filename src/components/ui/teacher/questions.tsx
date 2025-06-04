@@ -157,7 +157,7 @@ export default function FeedbackForm() {
     setErrorMessage(null);
 
     try {
-      const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/feedbackForm", {
+      const response = await fetch("https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/feedbackForm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

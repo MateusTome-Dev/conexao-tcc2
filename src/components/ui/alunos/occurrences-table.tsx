@@ -13,7 +13,7 @@ export function OccurrencesTable() {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/feedbackteacher/student/${id}`)
+      fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/feedbackteacher/student/${id}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Erro ao buscar feedback');

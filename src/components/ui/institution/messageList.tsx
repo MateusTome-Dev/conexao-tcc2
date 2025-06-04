@@ -30,7 +30,7 @@ function MessageList({ className }: { className?: string }) {
     const fetchMessages = async () => {
       try {
         const reminderResponse = await fetch(
-          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/reminder`
+          `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/reminder`
         );
 
         if (!reminderResponse.ok) throw new Error("Nenhum aviso disponível.");

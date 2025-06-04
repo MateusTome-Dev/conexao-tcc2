@@ -99,7 +99,7 @@ const EngagementChart: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
 
-      const resposta = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher", {
+      const resposta = await fetch("https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

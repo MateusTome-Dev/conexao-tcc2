@@ -49,7 +49,7 @@ export default function User({
 
 
 
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`);
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`);
       console.log(id);
       
       // Verifica se a resposta da API foi bem-sucedida
