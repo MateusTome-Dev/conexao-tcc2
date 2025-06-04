@@ -64,7 +64,7 @@ export default function User() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token não encontrado");
 
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${id}`, {
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -70,19 +70,14 @@ export default function TeacherProfileEdit() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Função aprimorada para formatar a data do backend para o input date
   const formatDateForInput = (backendDate: string): string => {
     if (!backendDate) return "";
 
-    // Se já estiver no formato correto (YYYY-MM-DD)
     if (/^\d{4}-\d{2}-\d{2}$/.test(backendDate)) {
       return backendDate;
     }
 
-    // Remove qualquer parte de tempo e timezone se existir
     const datePart = backendDate.split('T')[0].split(' ')[0];
-
-    // Cria a data ajustando para o fuso horário local
     const date = new Date(datePart);
     if (isNaN(date.getTime())) return "";
 
@@ -93,17 +88,13 @@ export default function TeacherProfileEdit() {
     return `${year}-${month}-${day}`;
   };
 
-  // Função para formatar a data para o backend
   const formatDateForBackend = (dateString: string): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000-03:00`;
+    return `${year}-${month}-${day}T00:00:00.000-03:00`;
   };
 
   const formatPhone = (value: string): string => {
@@ -130,7 +121,6 @@ export default function TeacherProfileEdit() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Validação de idade mínima (18 anos)
     const minAgeDate = new Date();
     minAgeDate.setFullYear(minAgeDate.getFullYear() - 18);
 
@@ -162,10 +152,6 @@ export default function TeacherProfileEdit() {
 
         const data = await response.json();
 
-        console.log("Dados brutos do backend:", data);
-        console.log("Data de nascimento recebida:", data.dataNascimentoDocente);
-        console.log("Data formatada:", formatDateForInput(data.dataNascimentoDocente));
-
         setTeacherData({
           id: data.id,
           name: data.nomeDocente || "",
@@ -189,7 +175,6 @@ export default function TeacherProfileEdit() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Validação de campos obrigatórios
     if (!teacherData.name.trim() || !teacherData.email || 
         !teacherData.birthDate || !teacherData.phone) {
       toast.warn("Preencha todos os campos obrigatórios.");
@@ -197,7 +182,6 @@ export default function TeacherProfileEdit() {
       return;
     }
 
-    // Validação do nome
     if (!validateName(teacherData.name)) {
       toast.warn("Nome deve conter apenas letras e ter pelo menos 3 caracteres");
       setIsSubmitting(false);
@@ -210,7 +194,6 @@ export default function TeacherProfileEdit() {
       return;
     }
 
-    // Validação do email
     if (!validateEmail(teacherData.email)) {
       if (teacherData.email.includes(' ')) {
         toast.warn("Email não pode conter espaços");
@@ -223,13 +206,11 @@ export default function TeacherProfileEdit() {
       return;
     }
 
-    // Validação da data de nascimento
     if (!validateDate(teacherData.birthDate)) {
       setIsSubmitting(false);
       return;
     }
 
-    // Validação do telefone
     if (!validatePhone(teacherData.phone)) {
       toast.warn("Telefone deve ter 10 ou 11 dígitos (com DDD)");
       setIsSubmitting(false);

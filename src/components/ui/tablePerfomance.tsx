@@ -124,7 +124,7 @@ const EngagementChart: React.FC = () => {
       if (!token) throw new Error("Token não encontrado");
       if (!studentId) throw new Error("ID do aluno não encontrado na URL");
 
-      const resposta = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/feedback/${studentId}`, {
+      const resposta = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/feedback/${studentId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

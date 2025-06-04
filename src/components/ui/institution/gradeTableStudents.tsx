@@ -212,7 +212,7 @@ const Table = () => {
         if (!userId) throw new Error("ID do usuário não encontrado no token")
 
         // Requisição para a API
-        const resposta = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`)
+        const resposta = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`)
 
         if (!resposta.ok) {
           throw new Error("Falha ao buscar os dados")

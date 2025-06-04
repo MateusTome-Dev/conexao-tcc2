@@ -275,7 +275,7 @@ export default function Profile() {
       const cleanedPhone = telefoneDocente.replace(/\D/g, "");
 
       const response = await fetch(
-        "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher",
+        "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher",
         {
           method: "POST",
           headers: {
