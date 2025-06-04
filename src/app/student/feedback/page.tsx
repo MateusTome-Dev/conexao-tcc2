@@ -69,7 +69,7 @@ export default function Home() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher");
+        const response = await fetch("https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher");
         const data: Professor[] = await response.json();
         setTeachers(data);
       } catch (error) {
