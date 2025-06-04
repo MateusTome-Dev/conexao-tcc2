@@ -156,7 +156,7 @@ export default function TeacherProfileEdit() {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${id}`
+          `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher/${id}`
         );
         if (!response.ok) throw new Error("Falha ao buscar dados do professor");
 
@@ -248,7 +248,7 @@ export default function TeacherProfileEdit() {
       }
 
       const response = await fetch(
-        `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${id}`,
+        `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher/${id}`,
         {
           method: "PUT",
           headers: {

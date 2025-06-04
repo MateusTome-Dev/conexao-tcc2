@@ -74,7 +74,7 @@ export default function StudentFeedbackPage() {
         if (!token) throw new Error("Token de autenticação não encontrado");
 
         const response = await fetch(
-          `https://backendona-amfeefbna8ebfmbj.eastus2-01.azurewebsites.net/api/student/${studentId}`,
+          `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${studentId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

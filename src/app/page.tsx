@@ -33,7 +33,7 @@ export default function LoginPage() {
     if (identifierCode.startsWith("p")) {
       try {
         const response = await fetch(
-          "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/login",
+          "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher/login",
           {
             method: "POST",
             headers: {
@@ -69,7 +69,7 @@ export default function LoginPage() {
     } else if (identifierCode.startsWith("a")) {
       try {
         const response = await fetch(
-          "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/login",
+          "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/login",
           {
             method: "POST",
             headers: {
@@ -105,7 +105,7 @@ export default function LoginPage() {
     } else {
       try {
         const response = await fetch(
-          "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/institution/login",
+          "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/institution/login",
           {
             method: "POST",
             headers: {

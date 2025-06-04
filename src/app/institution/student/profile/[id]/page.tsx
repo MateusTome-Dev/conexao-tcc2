@@ -48,7 +48,7 @@ export default function User({
   // Função para buscar os dados do estudante na API
   const fetchStudentData = async () => {
     try {
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`);
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`);
       if (!response.ok)
         throw new Error("Não foi possível carregar os dados do estudante");
 
@@ -64,7 +64,7 @@ export default function User({
   // Função para deletar um estudante
   const deleteStudent = async (id: string) => {
     try {
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`, {
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Erro ao excluir o estudante");

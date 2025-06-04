@@ -48,7 +48,7 @@ export default function DashboardTeacher() {
             throw new Error("ID do usuário não encontrado no token");
           }
     
-          const apiUrl = `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/institution/${userId}`;
+          const apiUrl = `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/institution/${userId}`;
           
           console.log("Fazendo requisição para:", apiUrl); // Debug
     

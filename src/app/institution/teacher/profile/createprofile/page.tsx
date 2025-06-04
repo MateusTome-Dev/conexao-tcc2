@@ -170,7 +170,7 @@ export default function Profile() {
   useEffect(() => {
     setLoading(true);
     fetch(
-      "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/discipline"
+      "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/discipline"
     )
       .then((response) => response.json())
       .then((data: Disciplina[]) => {

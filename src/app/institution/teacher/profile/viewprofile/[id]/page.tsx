@@ -88,14 +88,14 @@ export default function User() {
       if (!token) throw new Error("Token não encontrado");
 
       // First remove teacher from classes
-      await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class-teacher?teacherId=${teacherId}`, {
+      await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/class-teacher?teacherId=${teacherId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: JSON.stringify({ teacherId: null }),
       });
 
       // Then delete the teacher
-      const response = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher/${teacherId}`, {
+      const response = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher/${teacherId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

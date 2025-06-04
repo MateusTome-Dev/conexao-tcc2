@@ -51,7 +51,7 @@ export default function EditClass() {
   // Buscar lista de professores da API
   useEffect(() => {
     fetch(
-      "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/teacher"
+      "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/teacher"
     )
       .then((response) => response.json())
       .then((data) => setDocentes(data))
@@ -61,7 +61,7 @@ export default function EditClass() {
   // Buscar lista de disciplinas da API
   useEffect(() => {
     fetch(
-      "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/discipline"
+      "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/discipline"
     )
       .then((response) => response.json())
       .then((data) => setDisciplinas(data))
@@ -191,7 +191,7 @@ export default function EditClass() {
     try {
       // Faz a requisição PUT para a API
       const response = await fetch(
-        `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class/${params.id}`,
+        `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/class/${params.id}`,
         {
           method: "PUT",
           headers: {
@@ -224,7 +224,7 @@ export default function EditClass() {
 
     // Busca os dados da turma, professores e disciplinas associadas
     fetch(
-      `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class/teacher/disciplinas/${id}`
+      `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/class/teacher/disciplinas/${id}`
     )
       .then((response) => response.json())
       .then((data) => {

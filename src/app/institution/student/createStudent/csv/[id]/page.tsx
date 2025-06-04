@@ -264,7 +264,7 @@ export default function CSVImporter() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/students/list",
+        "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/students/list",
         {
           method: "POST",
           headers: {

@@ -155,7 +155,8 @@ export default function CreateClass() {
   };
 
   try {
-    const response = await fetch("https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/class", {
+    const response = await fetch("https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/class", {
+   
       method: "POST",
       headers: {
         "Content-Type": "application/json",
