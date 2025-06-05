@@ -88,6 +88,7 @@ export default function User({
         </div>
         {studentData && (
           <ProfileInfo
+            name={studentData.nome}
             imageUrl={studentData.imageUrl} 
             email={studentData.emailAluno}
             birthDate={studentData.dataNascimentoAluno}
