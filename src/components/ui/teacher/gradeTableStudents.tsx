@@ -250,41 +250,39 @@ const Table = () => {
     }));
   };
 
+  const buscarNotas = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Token não encontrado");
+
+    const decoded: any = jwtDecode(token);
+    const userId = decoded?.sub;
+    if (!userId) throw new Error("ID do usuário não encontrado no token");
+
+    const resposta = await fetch(
+      `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`
+    );
+
+    if (!resposta.ok) {
+      throw new Error("Falha ao buscar os dados");
+    }
+
+    const dados = await resposta.json();
+
+    setNotasRaw(dados.notas);
+    const disciplinasOrganizadas = organizarNotasPorDisciplina(dados.notas);
+    setDisciplinas(disciplinasOrganizadas);
+
+    setDisciplinasDisponiveis(dados.turma.disciplinaTurmas);
+  } catch (erro) {
+    setErro((erro as Error).message);
+  } finally {
+    setCarregando(false);
+  }
+};
+
   // Faz a requisição para buscar as notas quando o componente for montado
   useEffect(() => {
-    const buscarNotas = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("Token não encontrado");
-
-        // 2. Decodifica o token para obter o ID do usuário
-        const decoded: any = jwtDecode(token);
-        const userId = decoded?.sub; // Supondo que o token contenha { id: 123 }
-        if (!userId) throw new Error("ID do usuário não encontrado no token");
-
-        // Requisição para a API
-        const resposta = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`);
-
-        if (!resposta.ok) {
-          throw new Error("Falha ao buscar os dados");
-        }
-
-        const dados = await resposta.json();
-
-        setNotasRaw(dados.notas);
-
-        const disciplinasOrganizadas = organizarNotasPorDisciplina(dados.notas);
-        setDisciplinas(disciplinasOrganizadas);
-
-        // Aqui você já tem as disciplinas da turma
-        setDisciplinasDisponiveis(dados.turma.disciplinaTurmas);
-      } catch (erro) {
-        setErro((erro as Error).message);
-      } finally {
-        setCarregando(false);
-      }
-    };
-
     buscarNotas();
   }, [id]); // Adicionei id como dependência para recarregar quando mudar
 
@@ -403,6 +401,7 @@ const Table = () => {
       }
 
       setDisciplinas(novasDisciplinas);
+      await buscarNotas();
       toast.success(`Nota ${dados.idNota ? "atualizada" : "adicionada"} com sucesso!`);
 
       fecharModal();
