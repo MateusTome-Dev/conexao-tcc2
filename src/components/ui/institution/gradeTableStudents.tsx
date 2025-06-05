@@ -284,7 +284,7 @@ const Table = () => {
       if (!token) throw new Error("Token não encontrado");
   
       // Endpoint para a requisição POST
-      const endpoint = "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/note";
+      const endpoint = "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/note";
   
       // Corpo da requisição no formato especificado
       const corpo = {

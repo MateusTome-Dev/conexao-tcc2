@@ -263,7 +263,7 @@ const Table = () => {
         if (!userId) throw new Error("ID do usuário não encontrado no token");
 
         // Requisição para a API
-        const resposta = await fetch(`https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/student/${id}`);
+        const resposta = await fetch(`https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/student/${id}`);
 
         if (!resposta.ok) {
           throw new Error("Falha ao buscar os dados");
@@ -356,8 +356,8 @@ const Table = () => {
       if (!disciplinaSelecionada) throw new Error("Disciplina não encontrada");
 
       const endpoint = dados.idNota
-        ? `https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/note/${dados.idNota}` // endpoint de edição
-        : "https://onacademy-e2h7csembwhrf2bu.brazilsouth-01.azurewebsites.net/api/note"; // endpoint de criação
+        ? `https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/note/${dados.idNota}` // endpoint de edição
+        : "https://onaback-fke4h4d2dkbfcsav.eastus2-01.azurewebsites.net/api/note"; // endpoint de criação
 
       const metodo = dados.idNota ? "PUT" : "POST";
 
