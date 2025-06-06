@@ -249,7 +249,7 @@ const Sidebar = () => {
                     <path d="M12 18v-6" />
                     <path d="m9 15 3 3 3-3" />
                   </svg>
-                  <a href="https://www.mediafire.com/file/247ah6dnljfg0pq/app-release_2.apk/file">
+                  <a href="https://www.mediafire.com/folder/nn3gdf0kvizof/ONA">
                     <span>Baixar app</span>
                   </a>
                 </button>
